@@ -1,8 +1,8 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, finalize, tap } from 'rxjs';
+import { Observable, defer, finalize, tap } from 'rxjs';
 import { MACHINES_URL } from './api.config';
-import { Machine, MachineInput } from './machine.model';
+import { Machine, MachineInput, MachineStatus } from './machine.model';
 
 /** Tiempo tras el cual se avisa que el servidor puede estar "despertando" (Render gratuito). */
 const SLOW_MS = 3000;
@@ -18,6 +18,10 @@ export class MachineService {
   readonly loading = signal(false);
   readonly loaded = signal(false);
   readonly error = signal<string | null>(null);
+
+  /** Ids de los equipos cuyo estado se está guardando (cambio rápido). */
+  private readonly _savingStatus = signal<ReadonlySet<number>>(new Set());
+  readonly savingStatus = this._savingStatus.asReadonly();
 
   /** Peticiones en curso que ya superaron SLOW_MS. */
   private readonly slowCount = signal(0);
@@ -58,6 +62,23 @@ export class MachineService {
     return this.track(this.http.put<Machine>(`${MACHINES_URL}/${id}`, data)).pipe(tap((m) => this.upsert(m)));
   }
 
+  /** Cambio rápido de estado: PATCH /api/machines/:id con { status }. */
+  updateStatus(id: number, status: MachineStatus): Observable<Machine> {
+    return defer(() => {
+      this._savingStatus.update((set) => new Set(set).add(id));
+      return this.track(this.http.patch<Machine>(`${MACHINES_URL}/${id}`, { status }));
+    }).pipe(
+      tap((m) => this.upsert(m)),
+      finalize(() =>
+        this._savingStatus.update((set) => {
+          const next = new Set(set);
+          next.delete(id);
+          return next;
+        }),
+      ),
+    );
+  }
+
   remove(id: number): Observable<void> {
     return this.track(this.http.delete<void>(`${MACHINES_URL}/${id}`)).pipe(
       tap(() => this._machines.update((list) => list.filter((m) => m.id !== id))),
@@ -94,6 +115,8 @@ export function errorMessage(err: unknown): string {
     if (err.status === 0)
       return 'No se pudo conectar con el servidor. Verifica tu conexión e inténtalo de nuevo.';
     if (err.status === 404) return 'El equipo no existe o fue eliminado.';
+    if (err.status === 429)
+      return 'Demasiadas solicitudes seguidas. Espera un momento e inténtalo de nuevo.';
     const body = err.error as { message?: string; errors?: string[] } | null;
     if (body?.errors?.length) return `${body.message ?? 'Datos inválidos.'} ${body.errors.join(' ')}`;
     if (body?.message) return body.message;

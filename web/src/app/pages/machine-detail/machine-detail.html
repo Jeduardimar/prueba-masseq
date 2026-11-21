@@ -11,6 +11,28 @@
       <h1>{{ m.title }}</h1>
       <span class="status-badge status-badge--{{ m.status }}">{{ statusLabel(m.status) }}</span>
 
+      <div class="status-change">
+        <span class="status-change__label" id="status-change-label">Cambiar estado</span>
+        <div class="status-change__row">
+          <mat-button-toggle-group
+            [value]="m.status"
+            (change)="changeStatus($event.value)"
+            [disabled]="savingStatus()"
+            aria-labelledby="status-change-label"
+            hideSingleSelectionIndicator
+          >
+            @for (s of statuses; track s.value) {
+              <mat-button-toggle [value]="s.value">
+                <span class="status-dot status-dot--{{ s.value }}" aria-hidden="true"></span>{{ s.label }}
+              </mat-button-toggle>
+            }
+          </mat-button-toggle-group>
+          @if (savingStatus()) {
+            <mat-spinner diameter="20" aria-label="Guardando estado" />
+          }
+        </div>
+      </div>
+
       <dl class="specs">
         <div><dt>Marca</dt><dd>{{ m.brand }}</dd></div>
         <div><dt>Modelo</dt><dd>{{ m.model }}</dd></div>

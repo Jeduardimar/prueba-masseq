@@ -113,3 +113,31 @@
     gap: 18px;
   }
 }
+
+/* Cambio rápido de estado */
+.status-change {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.status-change__label {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5a6579;
+}
+
+.status-change__row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  mat-button-toggle-group {
+    flex-wrap: wrap;
+  }
+}

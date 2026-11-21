@@ -94,11 +94,10 @@
   } @else {
     <ul class="grid">
       @for (m of filtered(); track m.id) {
-        <li>
+        <li class="card-item">
           <a class="card" [routerLink]="['/maquinaria', m.id]">
             <div class="card__media">
               <img appMachineImage [image]="m.image" [type]="m.type" [alt]="m.title" width="400" height="260" />
-              <span class="status-badge status-badge--{{ m.status }} card__status">{{ statusLabel(m.status) }}</span>
             </div>
             <div class="card__body">
               <span class="card__type">{{ typeLabel(m.type) }}</span>
@@ -107,6 +106,10 @@
               <p class="card__location"><mat-icon inline>place</mat-icon> {{ m.location }}</p>
             </div>
           </a>
+          <!-- Fuera del enlace (un botón no puede ir dentro de <a>); se superpone sobre la foto. -->
+          <div class="card__status">
+            <app-status-menu [machine]="m" />
+          </div>
         </li>
       }
     </ul>

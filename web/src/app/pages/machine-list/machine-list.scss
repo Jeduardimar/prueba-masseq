@@ -128,11 +128,6 @@
     box-shadow 0.2s,
     transform 0.2s;
 
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgb(30 78 156 / 0.15);
-  }
-
   &:focus-visible {
     outline: 3px solid var(--masseq-yellow);
     outline-offset: 2px;
@@ -152,11 +147,27 @@
   }
 }
 
+.card-item {
+  position: relative;
+
+  &:hover .card,
+  &:hover .card__status {
+    transform: translateY(-3px);
+  }
+  &:hover .card {
+    box-shadow: 0 8px 20px rgb(30 78 156 / 0.15);
+  }
+}
+
 .card__status {
   position: absolute;
   top: 10px;
   left: 10px;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  transition: transform 0.2s;
 }
 
 .card__body {

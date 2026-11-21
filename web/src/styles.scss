@@ -170,3 +170,23 @@ a {
     text-decoration: underline;
   }
 }
+
+/* Punto de color de cada estado (menú y botones de cambio rápido) */
+.status-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 8px;
+  border-radius: 50%;
+  vertical-align: middle;
+
+  &--disponible {
+    background: var(--status-disponible);
+  }
+  &--en_obra {
+    background: var(--status-en_obra);
+  }
+  &--mantenimiento {
+    background: var(--status-mantenimiento);
+  }
+}

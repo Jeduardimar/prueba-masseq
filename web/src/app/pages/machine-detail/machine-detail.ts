@@ -2,19 +2,28 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { filter, switchMap } from 'rxjs';
 import { MachineService, errorMessage } from '../../core/machine.service';
-import { statusLabel, typeLabel } from '../../core/machine.model';
+import { MACHINE_STATUSES, MachineStatus, statusLabel, typeLabel } from '../../core/machine.model';
+import { StatusChanger } from '../../core/status-changer';
 import { MachineImage } from '../../shared/machine-image';
 import { ConfirmDialog, ConfirmDialogData } from '../../shared/confirm-dialog';
 
 @Component({
   selector: 'app-machine-detail',
-  imports: [RouterLink, MatButtonModule, MatIconModule, MatProgressSpinnerModule, MachineImage],
+  imports: [
+    RouterLink,
+    MatButtonModule,
+    MatButtonToggleModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MachineImage,
+  ],
   templateUrl: './machine-detail.html',
   styleUrl: './machine-detail.scss',
 })
@@ -23,6 +32,7 @@ export class MachineDetail {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly statusChanger = inject(StatusChanger);
 
   /** Parámetro :id de la ruta (withComponentInputBinding). */
   readonly id = input.required<string>();
@@ -47,8 +57,17 @@ export class MachineDetail {
   });
 
   protected readonly deleting = signal(false);
+  protected readonly statuses = MACHINE_STATUSES;
+  protected readonly savingStatus = computed(() => this.service.savingStatus().has(this.machineId()));
   protected readonly typeLabel = typeLabel;
   protected readonly statusLabel = statusLabel;
+
+  /** Cambio rápido de estado desde el grupo de botones. */
+  protected changeStatus(status: MachineStatus): void {
+    const m = this.machine();
+    if (!m) return;
+    this.statusChanger.change(m, status, (updated) => this.resource.set(updated));
+  }
 
   protected retry(): void {
     this.resource.reload();

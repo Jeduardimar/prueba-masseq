@@ -13,10 +13,10 @@ import {
   MACHINE_TYPES,
   MachineStatus,
   normalize,
-  statusLabel,
   typeLabel,
 } from '../../core/machine.model';
 import { MachineImage } from '../../shared/machine-image';
+import { StatusMenu } from '../../shared/status-menu';
 
 @Component({
   selector: 'app-machine-list',
@@ -30,6 +30,7 @@ import { MachineImage } from '../../shared/machine-image';
     MatProgressSpinnerModule,
     MatSelectModule,
     MachineImage,
+    StatusMenu,
   ],
   templateUrl: './machine-list.html',
   styleUrl: './machine-list.scss',
@@ -41,7 +42,6 @@ export class MachineList {
   protected readonly types = MACHINE_TYPES;
   protected readonly statuses = MACHINE_STATUSES;
   protected readonly typeLabel = typeLabel;
-  protected readonly statusLabel = statusLabel;
 
   // Filtros en la URL (?q=&tipo=&estado=) para conservarlos al volver del detalle.
   readonly q = input<string>();
