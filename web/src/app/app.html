@@ -24,7 +24,40 @@
 </main>
 
 <footer class="footer">
-  <p class="footer__brand">MASSEQ <span class="footer__sep" aria-hidden="true">|</span> CONSTRUIMOS CONFIANZA</p>
-  <p>Desarrollado por Juan Eduardo Díaz Martínez</p>
-  <p class="footer__note">Prueba técnica MASSEQ · {{ year }} · Datos de ejemplo</p>
+  <div class="footer__inner">
+    <section class="footer__col footer__col--brand" aria-label="MASSEQ">
+      <img class="footer__logo" src="brand/logo-masseq-teq-dark.png" alt="MASSEQ" width="339" height="146" loading="lazy" />
+      <p class="footer__brand">MASSEQ <span class="footer__sep" aria-hidden="true">|</span> CONSTRUIMOS CONFIANZA</p>
+      <p class="footer__text">Sistema de Gestión de Flota</p>
+    </section>
+
+    <section class="footer__col" aria-labelledby="footer-sedes">
+      <h2 class="footer__title" id="footer-sedes">Sedes</h2>
+      <ul class="footer__list">
+        <li><mat-icon aria-hidden="true">place</mat-icon> Oficina: Neiva, Huila</li>
+        <li><mat-icon aria-hidden="true">factory</mat-icon> Planta: Km 5 Vía Tesalia–Neiva</li>
+      </ul>
+    </section>
+
+    <nav class="footer__col" aria-labelledby="footer-enlaces">
+      <h2 class="footer__title" id="footer-enlaces">Enlaces</h2>
+      <ul class="footer__list">
+        <li>
+          <a class="footer__link" href="https://web.masseq.com.co" target="_blank" rel="noopener noreferrer">
+            Sitio web oficial<mat-icon class="footer__ext" aria-hidden="true">open_in_new</mat-icon>
+            <span class="visually-hidden">(se abre en una pestaña nueva)</span>
+          </a>
+        </li>
+        <li><a class="footer__link" routerLink="/">Inicio</a></li>
+        <li><a class="footer__link" routerLink="/maquinaria/nueva">Agregar equipo</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="footer__bottom">
+    <div class="footer__bottom-inner">
+      <p>© {{ year }} Masseq Proyectos e Ingeniería S.A.S. · Todos los derechos reservados</p>
+      <p class="footer__version">v1.2</p>
+    </div>
+  </div>
 </footer>
