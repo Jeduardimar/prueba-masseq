@@ -1,0 +1,28 @@
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="brand" routerLink="/" aria-label="MASSEQ · Flota de maquinaria – ir al inicio">
+      <span class="brand__logo" aria-hidden="true"><mat-icon>construction</mat-icon></span>
+      <span class="brand__text"><strong>MASSEQ</strong> <span class="brand__sep">·</span> Flota de maquinaria</span>
+    </a>
+    <a mat-flat-button class="add-btn" routerLink="/maquinaria/nueva">
+      <mat-icon>add</mat-icon>
+      <span class="add-btn__label">Agregar equipo</span>
+    </a>
+  </div>
+</header>
+
+@if (machines.slow()) {
+  <div class="slow-banner" role="status" aria-live="polite">
+    <mat-spinner diameter="18" strokeWidth="3" />
+    <span>Conectando con el servidor, puede tardar hasta un minuto…</span>
+  </div>
+}
+
+<main class="content">
+  <router-outlet />
+</main>
+
+<footer class="footer">
+  <p>Desarrollado por Juan Eduardo Díaz Martínez</p>
+  <p class="footer__note">Prueba técnica MASSEQ · {{ year }} · Datos de ejemplo</p>
+</footer>
