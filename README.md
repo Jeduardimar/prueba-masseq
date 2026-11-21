@@ -100,7 +100,7 @@ Modelo de un equipo:
 
 - `type`: `volqueta | retroexcavadora | excavadora | motoniveladora | vibrocompactador | cargador | bulldozer | carrotanque | trituradora`
 - `status`: `disponible | en_obra | mantenimiento`
-- `image` (opcional): URL `https://` pública (ver [Seguridad](#seguridad)) o una imagen propia `/images/<nombre>.jpg|.svg`. Si se omite, se asigna la foto del tipo (`/images/<tipo>.jpg`).
+- `image` (opcional): URL `https://` pública (ver [Seguridad](#seguridad)), una imagen propia `/images/<nombre>.jpg|.svg` o una subida `/uploads/<uuid>.webp`. Si se omite, se asigna la foto del tipo (`/images/<tipo>.jpg`).
 - `statusHistory` (solo lectura): tramos `{ status, from, to }` con fechas ISO 8601 en orden cronológico; el
   último es el estado actual y tiene `to: null`. `POST` lo crea con el estado inicial; `PUT`/`PATCH` cierran el
   tramo actual y abren uno nuevo **solo si cambia el estado**. El cliente no puede enviarlo (la validación lo
@@ -115,7 +115,9 @@ Modelo de un equipo:
 | POST | `/api/machines` | Crea un equipo (201) |
 | PUT | `/api/machines/:id` | Reemplaza un equipo; sin imagen → foto del tipo |
 | PATCH | `/api/machines/:id` | Actualiza parcialmente (p. ej. `{ "status": "en_obra" }`); si cambia el tipo y la imagen era una ilustración, se ajusta |
-| DELETE | `/api/machines/:id` | Elimina un equipo (204) |
+| DELETE | `/api/machines/:id` | Elimina un equipo (204); borra su imagen subida |
+| POST | `/api/uploads` | Sube una imagen (multipart, campo `image`, máx. 2 MB) → `201 { "image": "/uploads/<uuid>.webp" }` |
+| GET | `/uploads/<uuid>.webp` | Imagen subida (re-codificada a WebP, sin metadatos) |
 | GET | `/api/catalog` | Tipos y estados válidos |
 | GET | `/api/health` | Estado del servicio |
 | GET | `/images/<tipo>.jpg` | Foto por defecto de cada tipo de equipo |
@@ -277,22 +279,33 @@ Revisión basada en el **OWASP Top 10:2025**.
 - `android:allowBackup="false"`, APK de release **ofuscado** (`--obfuscate --split-debug-info=build/symbols`)
   y sin `print` de datos sensibles.
 
-### Siguiente paso: subir imágenes desde el dispositivo
+### Implementado: subir imágenes desde el dispositivo
 
-Hoy la imagen es una URL externa o la foto del tipo. Subir archivos **no está implementado**; este sería el
-diseño seguro:
+En el formulario, la sección **Imagen** permite **subir una foto** (botón o arrastrar y soltar) o pegar una URL
+https. Medidas de seguridad (`backend/src/uploads.js`):
 
-1. **Recepción:** `multer` con almacenamiento **en memoria**, un solo archivo y máximo **2 MB** (`limits`).
-2. **Tipo real:** verificar los *magic bytes* del archivo (p. ej. con `file-type`) y aceptar solo JPEG, PNG y
-   WebP; no confiar en la extensión ni en el `Content-Type`. **Sin SVG** (puede llevar scripts).
-3. **Re-codificación** con `sharp`: redimensionar (p. ej. máx. 1600 px), volver a codificar a WebP/JPEG y
-   **quitar metadatos EXIF** (ubicación GPS, cámara). Esto también neutraliza archivos "políglotas".
-4. **Nombre aleatorio** con UUID (`crypto.randomUUID()`), nunca el nombre original; rutas sin datos del usuario.
-5. **Límites:** rate limit específico para subidas y un **tope de almacenamiento** (número de archivos y MB).
-6. **Al servirlas:** `X-Content-Type-Options: nosniff`, `Content-Type` fijo según el formato re-codificado,
-   `Content-Disposition: inline` y una CSP restrictiva (`default-src 'none'`) en esas rutas.
-7. **Almacenamiento persistente** tipo S3 o Cloudinary (URLs firmadas o bucket público de solo lectura),
-   porque Render gratuito **borra el disco al reiniciar** y las imágenes se perderían.
+1. **Recepción:** `POST /api/uploads` con `multer` en **memoria** (nada se escribe sin verificar), campo
+   `image`, límites `fileSize` 2 MB, `files` 1, `fields` 0 y `parts` 2 → `413` si supera 2 MB.
+2. **Tipo real:** se verifica la **firma de los bytes** (JPEG `FF D8 FF`, PNG `89 50 4E 47 0D 0A 1A 0A`, WebP
+   `RIFF…WEBP`); la extensión y el *mimetype* se ignoran. Cualquier otra cosa, incluido **SVG**, → `415`.
+3. **Re-codificación** con `sharp` (`limitInputPixels` 40 MP, `failOn: 'error'`): rotación según EXIF,
+   máximo 1200 × 1200 px y salida **WebP** calidad 80. Así se eliminan **EXIF/GPS** y cualquier contenido oculto.
+4. **Nombre aleatorio:** `uploads/<crypto.randomUUID()>.webp`; el nombre original nunca se usa (un archivo
+   llamado `../../server.js.jpg` se guarda igual con un UUID).
+5. **Límites:** 10 subidas / 15 min por IP (`429`) y tope total de **200 archivos o 50 MB** (`507`).
+6. **Al servirlas** (`/uploads`, `express.static` con `dotfiles: 'deny'` e `index: false`): `Content-Type:
+   image/webp`, `X-Content-Type-Options: nosniff`, `Content-Security-Policy: default-src 'none'`,
+   `Cross-Origin-Resource-Policy: cross-origin` y caché inmutable de 7 días.
+7. **Validación de la ruta:** `image` solo acepta `/uploads/<uuid v4>.webp` con una regex estricta.
+8. **Limpieza:** al reemplazar la imagen de un equipo o eliminarlo se borra su archivo (si ningún otro equipo
+   lo usa) y, al arrancar, se borran las subidas huérfanas.
+9. **Web:** valida tipo y tamaño antes de subir, muestra una vista previa local (`URL.createObjectURL`, que se
+   revoca al cambiar o salir) y una barra de progreso; la CSP de Vercel permite `blob:` en `img-src`.
+10. Errores en español (`413`, `415`, `429`, `507`) y sin trazas.
+
+> **Limitación de Render gratuito:** el disco no es persistente, así que **las imágenes subidas se borran
+> cuando el servicio se reinicia** (y los equipos vuelven al seed). En producción real se guardarían en un
+> almacenamiento persistente tipo **S3 o Cloudinary**.
 
 ### Limitación declarada
 

@@ -8,6 +8,9 @@ import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 export const IMAGE_URL_MAX_LENGTH = 500;
 const OWN_IMAGE = /^\/images\/[a-z_-]+\.(jpg|svg)$/;
+/** Imagen subida: /uploads/<uuid v4>.webp (misma regex que la API). */
+export const UPLOAD_PATH =
+  /^\/uploads\/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.webp$/;
 
 function isPrivateIPv4(host: string): boolean {
   const m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(host);
@@ -49,7 +52,7 @@ export function isLocalHost(hostname: string): boolean {
 /** Mensaje de error en español o null si la imagen es válida (o está vacía: es opcional). */
 export function imageUrlError(value: string | null | undefined): string | null {
   const img = (value ?? '').trim();
-  if (!img || OWN_IMAGE.test(img)) return null;
+  if (!img || OWN_IMAGE.test(img) || UPLOAD_PATH.test(img)) return null;
   if (img.length > IMAGE_URL_MAX_LENGTH)
     return `La URL no puede superar ${IMAGE_URL_MAX_LENGTH} caracteres.`;
 

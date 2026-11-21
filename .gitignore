@@ -9,6 +9,8 @@ out-tsc/
 # Backend: base de datos local (se crea desde data/seed.json)
 backend/data/db.json
 backend/data/db.json.tmp
+# Imágenes subidas desde la web (se crean al usar la app)
+backend/uploads/
 .env
 
 # Flutter / Dart

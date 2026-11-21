@@ -21,7 +21,12 @@ import {
   typeLabel,
 } from '../../core/machine.model';
 import { MachineImage } from '../../shared/machine-image';
-import { imageUrlValidator } from '../../core/image-url';
+import { UPLOAD_PATH, imageUrlValidator } from '../../core/image-url';
+import { UploadService, uploadFileError } from '../../core/upload.service';
+import { HttpEventType } from '@angular/common/http';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { DestroyRef } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 const MIN_YEAR = 1980;
 const MAX_YEAR = new Date().getFullYear() + 1;
@@ -50,6 +55,7 @@ const LABELS: Record<string, string> = {
     MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    MatProgressBarModule,
     MatSelectModule,
     MachineImage,
   ],
@@ -61,6 +67,14 @@ export class MachineForm {
   private readonly service = inject(MachineService);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly uploader = inject(UploadService);
+
+  /** Subida desde el dispositivo: vista previa local (blob:), progreso (0–100) y error. */
+  protected readonly localPreview = signal<string | null>(null);
+  protected readonly uploadProgress = signal<number | null>(null);
+  protected readonly uploadError = signal<string | null>(null);
+  protected readonly dragging = signal(false);
+  private uploadSub?: Subscription;
 
   /** :id de la ruta; si no viene, el formulario es de creación. */
   readonly id = input<string>();
@@ -102,8 +116,8 @@ export class MachineForm {
       typeLabel: v.type ? typeLabel(v.type) : 'Tipo de equipo',
       status: v.status ?? 'disponible',
       statusLabel: statusLabel(v.status ?? 'disponible'),
-      // Si la URL está vacía o aún no es válida, se muestra la foto del tipo.
-      image: imageCtrl.valid ? v.image : '',
+      // Vista previa local mientras se sube; si la URL está vacía o no es válida, la foto del tipo.
+      image: this.localPreview() ?? (imageCtrl.valid ? v.image : ''),
       brandModel: [v.brand, v.model].filter(Boolean).join(' ') || 'Marca y modelo',
     };
   });
@@ -114,6 +128,10 @@ export class MachineForm {
   protected readonly serverError = signal<string | null>(null);
 
   constructor() {
+    inject(DestroyRef).onDestroy(() => {
+      this.uploadSub?.unsubscribe();
+      this.setLocalPreview(null);
+    });
     // En modo edición, carga el equipo (de memoria al instante y luego desde la API).
     effect(() => {
       if (!this.isEdit()) return;
@@ -175,9 +193,76 @@ export class MachineForm {
     return `${label} no es válido.`;
   }
 
+  /** true si la imagen actual es una subida (/uploads/<uuid>.webp). */
+  protected isUploaded(value: string): boolean {
+    return UPLOAD_PATH.test(value);
+  }
+
+  /** Quitar imagen: vuelve a la foto del tipo (y cancela una subida en curso). */
   protected clearImage(): void {
+    this.uploadSub?.unsubscribe();
+    this.uploadProgress.set(null);
+    this.uploadError.set(null);
+    this.setLocalPreview(null);
     this.form.controls.image.setValue('');
     this.form.controls.image.markAsDirty();
+  }
+
+  protected onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = ''; // permite volver a elegir el mismo archivo
+    if (file) this.uploadFile(file);
+  }
+
+  protected onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy';
+    this.dragging.set(true);
+  }
+
+  protected onDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.dragging.set(false);
+    const file = event.dataTransfer?.files?.[0];
+    if (file) this.uploadFile(file);
+  }
+
+  private uploadFile(file: File): void {
+    const error = uploadFileError(file);
+    if (error) {
+      this.uploadError.set(error);
+      return;
+    }
+    this.uploadSub?.unsubscribe();
+    this.uploadError.set(null);
+    this.setLocalPreview(URL.createObjectURL(file));
+    this.uploadProgress.set(0);
+
+    this.uploadSub = this.uploader.upload(file).subscribe({
+      next: (event) => {
+        if (event.type === HttpEventType.UploadProgress && event.total) {
+          this.uploadProgress.set(Math.round((event.loaded / event.total) * 100));
+        } else if (event.type === HttpEventType.Response && event.body) {
+          this.uploadProgress.set(null);
+          this.form.controls.image.setValue(event.body.image);
+          this.form.controls.image.markAsDirty();
+          this.snackBar.open('Imagen subida. Guarda el equipo para conservarla.', 'Cerrar', { duration: 4000 });
+        }
+      },
+      error: (err) => {
+        this.uploadProgress.set(null);
+        this.setLocalPreview(null);
+        this.uploadError.set(errorMessage(err));
+      },
+    });
+  }
+
+  /** Cambia la vista previa local y revoca la URL blob: anterior. */
+  private setLocalPreview(url: string | null): void {
+    const previous = this.localPreview();
+    if (previous) URL.revokeObjectURL(previous);
+    this.localPreview.set(url);
   }
 
   protected submit(): void {

@@ -3,10 +3,12 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const { rateLimit } = require('express-rate-limit');
+const multer = require('multer');
 const store = require('./store');
 const { validateMachine } = require('./validation');
 const { TYPES, STATUSES, defaultImage } = require('./catalog');
 const { startHistory, transition } = require('./history');
+const uploads = require('./uploads');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -54,9 +56,15 @@ app.use(
   }),
 );
 
-// Las escrituras con cuerpo deben enviar JSON.
+// Subidas: 10 / 15 min por IP.
+const uploadLimiter = rateLimit({
+  ...tooManyRequests('Demasiadas subidas de imágenes. Intenta de nuevo en unos minutos.'),
+  limit: 10,
+});
+
+// Las escrituras con cuerpo deben enviar JSON (salvo la subida de imágenes, que es multipart).
 app.use('/api', (req, res, next) => {
-  if (BODY_METHODS.has(req.method) && !req.is('application/json')) {
+  if (BODY_METHODS.has(req.method) && req.path !== '/uploads' && !req.is('application/json')) {
     return res.status(415).json({ message: 'El cuerpo debe enviarse como JSON (Content-Type: application/json).' });
   }
   next();
@@ -65,7 +73,35 @@ app.use(express.json({ limit: '10kb' }));
 // Ilustraciones propias de cada tipo de equipo
 app.use('/images', express.static(path.join(__dirname, '..', 'public', 'images'), { maxAge: '7d' }));
 
+// Imágenes subidas: solo archivos <uuid>.webp, con cabeceras estrictas.
+uploads.ensureUploadDir();
+app.use(
+  '/uploads',
+  express.static(uploads.UPLOAD_DIR, {
+    dotfiles: 'deny',
+    index: false,
+    redirect: false,
+    setHeaders: (res) => {
+      res.set({
+        'Content-Type': 'image/webp',
+        'X-Content-Type-Options': 'nosniff',
+        'Content-Security-Policy': "default-src 'none'",
+        'Cross-Origin-Resource-Policy': 'cross-origin',
+        'Cache-Control': 'public, max-age=604800, immutable',
+      });
+    },
+  }),
+);
+
 store.load();
+// Al arrancar se borran las subidas que ningún equipo usa.
+const orphans = uploads.removeOrphans(store.all().map((m) => m.image));
+if (orphans) console.log(`Subidas huérfanas eliminadas: ${orphans}`);
+
+/** Borra el archivo de una subida si ya ningún equipo la usa. */
+const releaseUpload = (image) => {
+  if (uploads.isUploadPath(image) && !store.all().some((m) => m.image === image)) uploads.deleteUpload(image);
+};
 
 const parseId = (req, res) => {
   const id = Number(req.params.id);
@@ -120,6 +156,20 @@ app.get(`${BASE}/:id`, (req, res) => {
   res.json(item);
 });
 
+// Subir imagen (multipart, campo "image"). Responde { image: "/uploads/<uuid>.webp" }.
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: uploads.MAX_FILE_BYTES, files: 1, fields: 0, parts: 2 },
+});
+app.post('/api/uploads', uploadLimiter, upload.single('image'), async (req, res, next) => {
+  if (!req.file) return res.status(400).json({ message: 'Envía la imagen en el campo "image" (multipart/form-data).' });
+  try {
+    res.status(201).json({ image: await uploads.saveUpload(req.file.buffer) });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Crear
 app.post(BASE, (req, res) => {
   const { errors, data } = validateMachine(req.body, false);
@@ -156,7 +206,10 @@ const updateHandler = (partial) => (req, res) => {
   if (data.status && data.status !== current.status) {
     data.statusHistory = transition(current.statusHistory, data.status);
   }
-  res.json(store.update(id, data));
+  const updated = store.update(id, data);
+  // Si se reemplazó una imagen subida, se borra el archivo anterior.
+  if (current.image !== updated.image) releaseUpload(current.image);
+  res.json(updated);
 };
 app.put(`${BASE}/:id`, updateHandler(false));
 app.patch(`${BASE}/:id`, updateHandler(true));
@@ -165,7 +218,9 @@ app.patch(`${BASE}/:id`, updateHandler(true));
 app.delete(`${BASE}/:id`, (req, res) => {
   const id = parseId(req, res);
   if (id === null) return;
-  if (!store.remove(id)) return res.status(404).json({ message: 'Equipo no encontrado.' });
+  const current = store.findById(id);
+  if (!current || !store.remove(id)) return res.status(404).json({ message: 'Equipo no encontrado.' });
+  releaseUpload(current.image);
   res.status(204).send();
 });
 
@@ -174,6 +229,11 @@ app.use((_req, res) => res.status(404).json({ message: 'Ruta no encontrada.' }))
 
 // Errores: respuestas en español y sin trazas internas.
 app.use((err, _req, res, _next) => {
+  if (err instanceof uploads.UploadError) return res.status(err.status).json({ message: err.message });
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') return res.status(413).json({ message: 'La imagen supera el máximo de 2 MB.' });
+    return res.status(400).json({ message: 'Envía una sola imagen en el campo "image" y ningún otro dato.' });
+  }
   if (err.type === 'entity.parse.failed') {
     return res.status(400).json({ message: 'El cuerpo de la petición no es un JSON válido.' });
   }
