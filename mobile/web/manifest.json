@@ -1,11 +1,11 @@
 {
-    "name": "juan_eduardo_diaz",
-    "short_name": "juan_eduardo_diaz",
+    "name": "MASSEQ Login",
+    "short_name": "MASSEQ Login",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#1E4E9C",
+    "theme_color": "#1E4E9C",
+    "description": "MASSEQ Login - app de la prueba técnica de MASSEQ.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
