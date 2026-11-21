@@ -17,7 +17,7 @@ buscar, ver el detalle, agregar, editar y eliminar equipos.
 | --- | --- |
 | Web (Vercel) | https://prueba-masseq.vercel.app |
 | API (Render) | https://masseq-flota-api.onrender.com |
-| App móvil (APK) | [Release v1.1](https://github.com/Jeduardimar/prueba-masseq/releases/tag/v1.1) (`masseq-login-v1.1.apk`) |
+| App móvil (APK) | [Release v1.2](https://github.com/Jeduardimar/prueba-masseq/releases/tag/v1.2) (`masseq-login-v1.2.apk`) |
 | Repositorio | https://github.com/Jeduardimar/prueba-masseq |
 
 **Credenciales de demo de la app móvil:** usuario `admin`, contraseña `Masseq2026*`.
@@ -217,7 +217,7 @@ flutter build apk --release --obfuscate --split-debug-info=build/symbols  # APK 
 python tool/generate_icon.py && dart run flutter_launcher_icons   # regenerar el ícono
 ```
 
-El APK de release se adjunta en **GitHub Releases** ([v1.1](https://github.com/Jeduardimar/prueba-masseq/releases/tag/v1.1), archivo `masseq-login-v1.1.apk`).
+El APK de release se adjunta en **GitHub Releases** ([v1.2](https://github.com/Jeduardimar/prueba-masseq/releases/tag/v1.2), archivo `masseq-login-v1.2.apk`).
 
 > **Nota de compilación en Windows:** el JDK que trae Android Studio es la versión 25, así que el proyecto
 > usa Gradle 9.1 y AGP 8.13 (la plantilla de Flutter traía Gradle 8.14, que no soporta Java 25). Si la ruta
