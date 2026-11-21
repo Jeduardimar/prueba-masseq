@@ -17,7 +17,7 @@ const STATUSES = {
   mantenimiento: 'En mantenimiento',
 };
 
-/** Ilustración por defecto según el tipo de equipo. */
-const defaultImage = (type) => `/images/${TYPES[type] ? type : 'default'}.svg`;
+/** Foto por defecto según el tipo de equipo (volqueta si el tipo no es válido). */
+const defaultImage = (type) => `/images/${TYPES[type] ? type : 'volqueta'}.jpg`;
 
 module.exports = { TYPES, STATUSES, defaultImage };

@@ -24,8 +24,8 @@ import { MachineImage } from '../../shared/machine-image';
 
 const MIN_YEAR = 1980;
 const MAX_YEAR = new Date().getFullYear() + 1;
-/** URL http(s) o ilustración propia del backend (/images/<tipo>.svg). */
-const IMAGE_PATTERN = /^(https?:\/\/\S+|\/images\/[a-z_-]+\.svg)$/i;
+/** URL http(s) o imagen propia del backend (/images/<nombre>.jpg|.svg). */
+const IMAGE_PATTERN = /^(https?:\/\/\S+|\/images\/[a-z_-]+\.(jpg|svg))$/i;
 
 /** Nombres de los campos en español para los mensajes de error. */
 const LABELS: Record<string, string> = {
@@ -103,7 +103,7 @@ export class MachineForm {
       typeLabel: v.type ? typeLabel(v.type) : 'Tipo de equipo',
       status: v.status ?? 'disponible',
       statusLabel: statusLabel(v.status ?? 'disponible'),
-      // Si la URL aún no es válida, se muestra la ilustración del tipo.
+      // Si la URL está vacía o aún no es válida, se muestra la foto del tipo.
       image: imageCtrl.valid ? v.image : '',
       brandModel: [v.brand, v.model].filter(Boolean).join(' ') || 'Marca y modelo',
     };
@@ -156,7 +156,7 @@ export class MachineForm {
       status: m.status,
       location: m.location,
       description: m.description ?? '',
-      // Las ilustraciones por defecto no se muestran como URL: el campo queda vacío.
+      // Las imágenes por defecto (/images/...) no se muestran como URL: el campo queda vacío.
       image: m.image && !m.image.startsWith('/images/') ? m.image : '',
     });
   }
@@ -200,7 +200,7 @@ export class MachineForm {
       status: v.status,
       location: v.location.trim(),
       description: v.description.trim(),
-      // Vacía → el backend asigna la ilustración del tipo.
+      // Vacía → el backend asigna la foto del tipo.
       image: v.image.trim(),
     };
 

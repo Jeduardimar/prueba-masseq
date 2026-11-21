@@ -1,9 +1,10 @@
 import { Directive, computed, input, linkedSignal } from '@angular/core';
-import { resolveImage, typeImage } from '../core/images';
+import { resolveImage, typeIllustration, typePhoto } from '../core/images';
 
 /**
  * <img appMachineImage [image]="m.image" [type]="m.type">
- * Resuelve la URL de la imagen y, si falla al cargar, muestra la ilustración del tipo.
+ * Resuelve la URL de la imagen; si falla al cargar, usa la foto del tipo (.jpg) y,
+ * si también falla, la ilustración del tipo (.svg).
  */
 @Directive({
   selector: 'img[appMachineImage]',
@@ -19,7 +20,7 @@ export class MachineImage {
   readonly type = input<string | null | undefined>();
 
   /**
-   * 0 = imagen original, 1 = ilustración del tipo, 2 = ilustración genérica.
+   * 0 = imagen original, 1 = foto del tipo (.jpg), 2 = ilustración del tipo (.svg).
    * Se reinicia a 0 cuando cambia la imagen o el tipo (p. ej. en la vista previa del formulario).
    */
   private readonly fallbackLevel = linkedSignal({
@@ -32,9 +33,9 @@ export class MachineImage {
       case 0:
         return resolveImage(this.image(), this.type());
       case 1:
-        return typeImage(this.type());
+        return typePhoto(this.type());
       default:
-        return typeImage(null);
+        return typeIllustration(this.type());
     }
   });
 

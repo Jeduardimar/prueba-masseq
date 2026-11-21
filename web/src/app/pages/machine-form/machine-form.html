@@ -125,7 +125,7 @@
               <mat-icon>close</mat-icon>
             </button>
           }
-          <mat-hint>Si la dejas vacía se usará la ilustración del tipo de equipo.</mat-hint>
+          <mat-hint>Si la dejas vacía se usará la foto del tipo de equipo.</mat-hint>
           @if (form.controls.image.invalid) {
             <mat-error>{{ errorFor('image') }}</mat-error>
           }
@@ -167,7 +167,7 @@
         </div>
       </div>
       @if (form.controls.image.value && form.controls.image.invalid) {
-        <p class="preview__note">La URL aún no es válida; se muestra la ilustración del tipo.</p>
+        <p class="preview__note">La URL aún no es válida; se muestra la foto del tipo.</p>
       }
     </aside>
   </div>

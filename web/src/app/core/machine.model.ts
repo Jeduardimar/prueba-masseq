@@ -22,7 +22,7 @@ export interface Machine {
   status: MachineStatus;
   location: string;
   description: string;
-  /** URL http(s) o ilustración propia /images/<tipo>.svg (opcional). */
+  /** URL http(s) o imagen propia /images/<tipo>.jpg|.svg (opcional). */
   image?: string;
 }
 

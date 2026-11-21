@@ -10,7 +10,7 @@
     "status": "en_obra",
     "location": "Obra vial – Tramo Tesalia–Paicol",
     "description": "Volqueta doble troque para transporte de agregados y material de excavación. Caja reforzada y sistema de volteo hidráulico.",
-    "image": "/images/volqueta.svg"
+    "image": "/images/volqueta.jpg"
   },
   {
     "id": 2,
@@ -23,7 +23,7 @@
     "status": "disponible",
     "location": "Planta Tesalia (Km 5 Vía Tesalia–Neiva)",
     "description": "Unidad de transporte de material pétreo desde planta hacia frentes de obra.",
-    "image": "/images/volqueta.svg"
+    "image": "/images/volqueta.jpg"
   },
   {
     "id": 3,
@@ -36,7 +36,7 @@
     "status": "mantenimiento",
     "location": "Taller central – Neiva",
     "description": "Volqueta sencilla para despachos urbanos y obras menores. En cambio de llantas y revisión de frenos.",
-    "image": "/images/volqueta.svg"
+    "image": "/images/volqueta.jpg"
   },
   {
     "id": 4,
@@ -49,7 +49,7 @@
     "status": "en_obra",
     "location": "Obra de alcantarillado – Neiva",
     "description": "Retroexcavadora 4x4 para zanjas, cargue de material y obras de redes.",
-    "image": "/images/retroexcavadora.svg"
+    "image": "/images/retroexcavadora.jpg"
   },
   {
     "id": 5,
@@ -62,7 +62,7 @@
     "status": "disponible",
     "location": "Patio de maquinaria – Neiva",
     "description": "Equipo versátil para excavación y cargue en espacios reducidos.",
-    "image": "/images/retroexcavadora.svg"
+    "image": "/images/retroexcavadora.jpg"
   },
   {
     "id": 6,
@@ -75,7 +75,7 @@
     "status": "en_obra",
     "location": "Frente de explotación – Planta Tesalia",
     "description": "Excavadora de 21 toneladas para extracción de material en cantera y cargue de volquetas.",
-    "image": "/images/excavadora.svg"
+    "image": "/images/excavadora.jpg"
   },
   {
     "id": 7,
@@ -88,7 +88,7 @@
     "status": "disponible",
     "location": "Planta Tesalia (Km 5 Vía Tesalia–Neiva)",
     "description": "Excavadora de nueva generación con bajo consumo de combustible.",
-    "image": "/images/excavadora.svg"
+    "image": "/images/excavadora.jpg"
   },
   {
     "id": 8,
@@ -101,7 +101,7 @@
     "status": "en_obra",
     "location": "Mantenimiento de vías terciarias – Huila",
     "description": "Motoniveladora para conformación de vías, cunetas y extendido de base granular.",
-    "image": "/images/motoniveladora.svg"
+    "image": "/images/motoniveladora.jpg"
   },
   {
     "id": 9,
@@ -114,7 +114,7 @@
     "status": "disponible",
     "location": "Patio de maquinaria – Neiva",
     "description": "Compactador de suelos para bases, subbases y terraplenes.",
-    "image": "/images/vibrocompactador.svg"
+    "image": "/images/vibrocompactador.jpg"
   },
   {
     "id": 10,
@@ -127,7 +127,7 @@
     "status": "mantenimiento",
     "location": "Taller central – Neiva",
     "description": "Compactador en mantenimiento preventivo del sistema vibratorio.",
-    "image": "/images/vibrocompactador.svg"
+    "image": "/images/vibrocompactador.jpg"
   },
   {
     "id": 11,
@@ -140,7 +140,7 @@
     "status": "en_obra",
     "location": "Planta El Agrado (Tamarindo)",
     "description": "Cargador de ruedas para despacho de agregados y alimentación de la planta trituradora.",
-    "image": "/images/cargador.svg"
+    "image": "/images/cargador.jpg"
   },
   {
     "id": 12,
@@ -153,7 +153,7 @@
     "status": "en_obra",
     "location": "Adecuación de plataforma – Tolima",
     "description": "Tractor de orugas para movimiento de tierras, descapote y conformación de terraplenes.",
-    "image": "/images/bulldozer.svg"
+    "image": "/images/bulldozer.jpg"
   },
   {
     "id": 13,
@@ -166,7 +166,7 @@
     "status": "disponible",
     "location": "Planta Tesalia (Km 5 Vía Tesalia–Neiva)",
     "description": "Carrotanque de agua para riego de vías, control de material particulado y humectación en compactación.",
-    "image": "/images/carrotanque.svg"
+    "image": "/images/carrotanque.jpg"
   },
   {
     "id": 14,
@@ -179,6 +179,6 @@
     "status": "en_obra",
     "location": "Planta Tesalia (Km 5 Vía Tesalia–Neiva)",
     "description": "Planta móvil de trituración primaria sobre orugas para producción de agregados (triturado, base y subbase granular).",
-    "image": "/images/trituradora.svg"
+    "image": "/images/trituradora.jpg"
   }
 ]

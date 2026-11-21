@@ -79,25 +79,26 @@ Modelo de un equipo:
   "status": "en_obra",
   "location": "Obra vial – Tramo Tesalia–Paicol",
   "description": "…",
-  "image": "/images/volqueta.svg"
+  "image": "/images/volqueta.jpg"
 }
 ```
 
 - `type`: `volqueta | retroexcavadora | excavadora | motoniveladora | vibrocompactador | cargador | bulldozer | carrotanque | trituradora`
 - `status`: `disponible | en_obra | mantenimiento`
-- `image` (opcional): URL `http(s)` o una ilustración propia `/images/<tipo>.svg`. Si se omite, se asigna la ilustración del tipo.
+- `image` (opcional): URL `http(s)` o una imagen propia `/images/<nombre>.jpg|.svg`. Si se omite, se asigna la foto del tipo (`/images/<tipo>.jpg`).
 
 | Método | Ruta | Descripción |
 | --- | --- | --- |
 | GET | `/api/machines?search=texto` | Lista los equipos (búsqueda opcional por nombre, marca o modelo, sin tildes) |
 | GET | `/api/machines/:id` | Detalle de un equipo |
 | POST | `/api/machines` | Crea un equipo (201) |
-| PUT | `/api/machines/:id` | Reemplaza un equipo; sin imagen → ilustración del tipo |
+| PUT | `/api/machines/:id` | Reemplaza un equipo; sin imagen → foto del tipo |
 | PATCH | `/api/machines/:id` | Actualiza parcialmente; si cambia el tipo y la imagen era una ilustración, se ajusta |
 | DELETE | `/api/machines/:id` | Elimina un equipo (204) |
 | GET | `/api/catalog` | Tipos y estados válidos |
 | GET | `/api/health` | Estado del servicio |
-| GET | `/images/<tipo>.svg` | Ilustraciones de cada tipo de equipo |
+| GET | `/images/<tipo>.jpg` | Foto por defecto de cada tipo de equipo |
+| GET | `/images/<tipo>.svg` | Ilustración de respaldo de cada tipo |
 
 Los errores de validación responden `400` con `{ "message": "...", "errors": ["..."] }` en español.
 
@@ -112,7 +113,7 @@ Los errores de validación responden `400` con `{ "message": "...", "errors": ["
 - [x] **Eliminar** con diálogo de confirmación; desaparece del listado.
 - [x] `MachineService` con `HttpClient` y un signal `machines` que se actualiza tras crear, editar o eliminar.
 - [x] Formulario reactivo con validaciones y mensajes en español, y **vista previa** de la imagen.
-- [x] Imágenes relativas (`/images/...`) resueltas contra la API; si una imagen falla se usa la ilustración del tipo.
+- [x] Imágenes relativas (`/images/...`) resueltas contra la API; si una imagen falla se usa la foto del tipo (`.jpg`) y, si también falla, su ilustración (`.svg`).
 - [x] Estados de **carga**, **error** (con reintentar) y **sin resultados**; aviso si la API tarda más de 3 s.
 - [x] Diseño responsive con la identidad de MASSEQ (azul `#1e4e9c`, acento amarillo `#f5b400`).
 - [x] `vercel.json` con *rewrites* para las rutas de la SPA.

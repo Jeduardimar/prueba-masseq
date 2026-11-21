@@ -54,10 +54,10 @@ function validateMachine(body, partial = false) {
     } else data.year = year;
   } else if (!partial) errors.push('El año es obligatorio.');
 
-  // image (opcional): URL http/https o ilustración propia /images/*.svg
+  // image (opcional): URL http/https o imagen propia /images/<nombre>.(jpg|svg)
   if (has('image')) {
     const img = String(b.image).trim();
-    let ok = /^\/images\/[a-z_-]+\.svg$/.test(img);
+    let ok = /^\/images\/[a-z_-]+\.(jpg|svg)$/.test(img);
     if (!ok) {
       try {
         const url = new URL(img);
@@ -66,7 +66,7 @@ function validateMachine(body, partial = false) {
         ok = false;
       }
     }
-    if (!ok) errors.push('La imagen debe ser una URL válida (http/https).');
+    if (!ok) errors.push('La imagen debe ser una URL válida (http/https) o una imagen propia /images/<nombre>.jpg|.svg.');
     else data.image = img;
   }
 
