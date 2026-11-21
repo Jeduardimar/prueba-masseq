@@ -8,6 +8,7 @@
 
 const MAX_LENGTH = 500;
 const OWN_IMAGE = /^\/images\/[a-z_-]+\.(jpg|svg)$/;
+const { UPLOAD_PATH } = require('./uploads');
 
 /** IPv4 en rangos locales o privados: 0/8, 10/8, 127/8, 169.254/16, 172.16/12, 192.168/16. */
 function isPrivateIPv4(host) {
@@ -51,7 +52,7 @@ function isLocalHost(hostname) {
 /** Devuelve el mensaje de error (en español) o null si la imagen es válida. */
 function imageUrlError(value) {
   const img = String(value).trim();
-  if (OWN_IMAGE.test(img)) return null;
+  if (OWN_IMAGE.test(img) || UPLOAD_PATH.test(img)) return null;
   if (img.length > MAX_LENGTH) return `La URL de la imagen no puede superar ${MAX_LENGTH} caracteres.`;
 
   let url;

@@ -116,8 +116,40 @@
       <fieldset class="group">
         <legend class="group__title"><mat-icon aria-hidden="true">photo_camera</mat-icon> Imagen</legend>
 
+        <!-- Subir desde el dispositivo (botón o arrastrar y soltar) -->
+        <div class="upload span-2" [class.upload--dragging]="dragging()"
+             (dragover)="onDragOver($event)" (dragleave)="dragging.set(false)" (drop)="onDrop($event)">
+          <input #fileInput type="file" class="upload__input" accept="image/jpeg,image/png,image/webp"
+                 (change)="onFileSelected($event)" aria-label="Elegir imagen del dispositivo" />
+          @if (isUploaded(form.controls.image.value)) {
+            <mat-icon class="upload__icon upload__icon--ok" aria-hidden="true">check_circle</mat-icon>
+            <p class="upload__text"><strong>Imagen subida desde el dispositivo.</strong></p>
+          } @else {
+            <mat-icon class="upload__icon" aria-hidden="true">cloud_upload</mat-icon>
+            <p class="upload__text">Arrastra una imagen aquí o</p>
+          }
+          <div class="upload__actions">
+            <button mat-stroked-button type="button" (click)="fileInput.click()" [disabled]="uploadProgress() !== null">
+              <mat-icon>upload</mat-icon> Subir desde el dispositivo
+            </button>
+            @if (form.controls.image.value || localPreview()) {
+              <button mat-button type="button" class="upload__remove" (click)="clearImage()">
+                <mat-icon>delete_outline</mat-icon> Quitar imagen
+              </button>
+            }
+          </div>
+          <p class="upload__hint">JPG, PNG o WebP · máximo 2 MB. Se quitan los metadatos (EXIF/GPS).</p>
+          @if (uploadProgress() !== null) {
+            <mat-progress-bar mode="determinate" [value]="uploadProgress()" aria-label="Progreso de la subida" />
+          }
+          @if (uploadError()) {
+            <p class="upload__error" role="alert">{{ uploadError() }}</p>
+          }
+        </div>
+
+        @if (!isUploaded(form.controls.image.value)) {
         <mat-form-field appearance="outline" class="span-2">
-          <mat-label>URL de la imagen (opcional)</mat-label>
+          <mat-label>O pega una URL https (opcional)</mat-label>
           <mat-icon matPrefix>image</mat-icon>
           <input matInput type="url" formControlName="image" placeholder="https://…" />
           @if (form.controls.image.value) {
@@ -130,6 +162,7 @@
             <mat-error>{{ errorFor('image') }}</mat-error>
           }
         </mat-form-field>
+        }
       </fieldset>
 
       @if (serverError()) {

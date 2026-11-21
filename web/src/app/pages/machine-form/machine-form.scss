@@ -70,6 +70,71 @@ h1 {
   font-weight: 400;
 }
 
+/* Zona de subida (botón o arrastrar y soltar) */
+.upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 16px;
+  border: 2px dashed #c5cfdf;
+  border-radius: 12px;
+  background: #f9fbfe;
+  text-align: center;
+
+  &--dragging {
+    border-color: var(--masseq-blue);
+    background: #eef4fc;
+  }
+
+  mat-progress-bar {
+    width: 100%;
+  }
+}
+
+.upload__input {
+  display: none;
+}
+
+.upload__icon {
+  width: 36px;
+  height: 36px;
+  font-size: 36px;
+  color: #8a99b3;
+
+  &--ok {
+    color: var(--status-disponible);
+  }
+}
+
+.upload__text,
+.upload__hint,
+.upload__error {
+  margin: 0;
+}
+
+.upload__hint {
+  font-size: 0.8rem;
+  color: #52607a;
+}
+
+.upload__error {
+  font-size: 0.875rem;
+  color: #b3261e;
+}
+
+.upload__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.upload__remove {
+  --mat-button-text-label-text-color: #c62828;
+}
+
 .span-2 {
   grid-column: 1 / -1;
 }
