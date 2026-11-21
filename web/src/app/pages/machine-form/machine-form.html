@@ -1,0 +1,174 @@
+@if (isEdit()) {
+  <a class="back-link" [routerLink]="['/maquinaria', id()]"><mat-icon>arrow_back</mat-icon> Volver al detalle</a>
+} @else {
+  <a class="back-link" routerLink="/"><mat-icon>arrow_back</mat-icon> Volver al listado</a>
+}
+
+<div class="page-header">
+  <h1>{{ isEdit() ? 'Editar equipo' : 'Agregar equipo' }}</h1>
+</div>
+
+@if (loadError()) {
+  <div class="state-box state-box--error" role="alert">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ loadError() }}</p>
+    <a mat-flat-button routerLink="/">Ir al listado</a>
+  </div>
+} @else if (loadingMachine()) {
+  <div class="state-box" role="status">
+    <mat-spinner diameter="44" />
+    <p>Cargando equipo…</p>
+  </div>
+} @else {
+  <div class="layout">
+    <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <fieldset class="group">
+        <legend>Identificación</legend>
+
+        <mat-form-field appearance="outline" class="span-2">
+          <mat-label>Nombre del equipo</mat-label>
+          <input matInput formControlName="title" placeholder="Ej.: Excavadora EX-03" maxlength="120" required />
+          @if (form.controls.title.invalid) {
+            <mat-error>{{ errorFor('title') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo de equipo</mat-label>
+          <mat-select formControlName="type" required>
+            @for (t of types; track t.value) {
+              <mat-option [value]="t.value">{{ t.label }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.type.invalid) {
+            <mat-error>{{ errorFor('type') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Estado</mat-label>
+          <mat-select formControlName="status" required>
+            @for (s of statuses; track s.value) {
+              <mat-option [value]="s.value">{{ s.label }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.status.invalid) {
+            <mat-error>{{ errorFor('status') }}</mat-error>
+          }
+        </mat-form-field>
+      </fieldset>
+
+      <fieldset class="group">
+        <legend>Ficha técnica</legend>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Marca</mat-label>
+          <input matInput formControlName="brand" placeholder="Ej.: Caterpillar" maxlength="60" required />
+          @if (form.controls.brand.invalid) {
+            <mat-error>{{ errorFor('brand') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Modelo</mat-label>
+          <input matInput formControlName="model" placeholder="Ej.: 320 GC" maxlength="60" required />
+          @if (form.controls.model.invalid) {
+            <mat-error>{{ errorFor('model') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Año</mat-label>
+          <input matInput type="number" formControlName="year" [min]="minYear" [max]="maxYear" placeholder="Ej.: 2021" required />
+          @if (form.controls.year.invalid) {
+            <mat-error>{{ errorFor('year') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Capacidad (opcional)</mat-label>
+          <input matInput formControlName="capacity" placeholder="Ej.: 14 m³, 20 t, 1,2 m³" maxlength="60" />
+          @if (form.controls.capacity.invalid) {
+            <mat-error>{{ errorFor('capacity') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="span-2">
+          <mat-label>Ubicación</mat-label>
+          <mat-icon matPrefix>place</mat-icon>
+          <input matInput formControlName="location" placeholder="Ej.: Obra vial – Tramo Neiva–Campoalegre" maxlength="120" required />
+          @if (form.controls.location.invalid) {
+            <mat-error>{{ errorFor('location') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="span-2">
+          <mat-label>Descripción (opcional)</mat-label>
+          <textarea matInput formControlName="description" rows="4" maxlength="2000"
+                    placeholder="Uso, características, observaciones de mantenimiento…"></textarea>
+          <mat-hint align="end">{{ form.controls.description.value.length }} / 2000</mat-hint>
+          @if (form.controls.description.invalid) {
+            <mat-error>{{ errorFor('description') }}</mat-error>
+          }
+        </mat-form-field>
+      </fieldset>
+
+      <fieldset class="group">
+        <legend>Imagen</legend>
+
+        <mat-form-field appearance="outline" class="span-2">
+          <mat-label>URL de la imagen (opcional)</mat-label>
+          <mat-icon matPrefix>image</mat-icon>
+          <input matInput type="url" formControlName="image" placeholder="https://…" />
+          @if (form.controls.image.value) {
+            <button matSuffix mat-icon-button type="button" aria-label="Quitar imagen" (click)="clearImage()">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+          <mat-hint>Si la dejas vacía se usará la ilustración del tipo de equipo.</mat-hint>
+          @if (form.controls.image.invalid) {
+            <mat-error>{{ errorFor('image') }}</mat-error>
+          }
+        </mat-form-field>
+      </fieldset>
+
+      @if (serverError()) {
+        <div class="server-error" role="alert">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ serverError() }}</span>
+        </div>
+      }
+
+      <div class="form-actions">
+        <a mat-button [routerLink]="isEdit() ? ['/maquinaria', id()] : ['/']">Cancelar</a>
+        <button mat-flat-button type="submit" [disabled]="saving()">
+          @if (saving()) {
+            <mat-spinner diameter="18" />
+          } @else {
+            <mat-icon>{{ isEdit() ? 'save' : 'add' }}</mat-icon>
+          }
+          {{ isEdit() ? 'Guardar cambios' : 'Agregar equipo' }}
+        </button>
+      </div>
+    </form>
+
+    <!-- Vista previa -->
+    <aside class="preview" aria-label="Vista previa">
+      <h2>Vista previa</h2>
+      <div class="preview__card">
+        <div class="preview__media">
+          <img appMachineImage [image]="preview().image" [type]="preview().type" alt="Vista previa de la imagen" width="400" height="260" />
+          <span class="status-badge status-badge--{{ preview().status }} preview__status">{{ preview().statusLabel }}</span>
+        </div>
+        <div class="preview__body">
+          <span class="preview__type">{{ preview().typeLabel }}</span>
+          <strong>{{ preview().title }}</strong>
+          <span class="preview__meta">{{ preview().brandModel }}</span>
+        </div>
+      </div>
+      @if (form.controls.image.value && form.controls.image.invalid) {
+        <p class="preview__note">La URL aún no es válida; se muestra la ilustración del tipo.</p>
+      }
+    </aside>
+  </div>
+}

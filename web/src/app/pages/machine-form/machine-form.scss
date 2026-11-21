@@ -1,0 +1,151 @@
+h1 {
+  font-size: 1.6rem;
+  font-weight: 500;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #e1e6ef;
+}
+
+.group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 14px;
+  row-gap: 4px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+
+  legend {
+    padding: 0;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: var(--masseq-blue);
+  }
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.span-2 {
+  grid-column: 1 / -1;
+}
+
+.server-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #fdecea;
+  color: #8e1c1c;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #e8ecf3;
+}
+
+.preview {
+  position: sticky;
+  top: 84px;
+
+  h2 {
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #52607a;
+  }
+}
+
+.preview__card {
+  overflow: hidden;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #e1e6ef;
+}
+
+.preview__media {
+  position: relative;
+  aspect-ratio: 400 / 260;
+  background: #e3ecfa;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.preview__status {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+.preview__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-top: 3px solid var(--masseq-yellow);
+  word-break: break-word;
+}
+
+.preview__type {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--masseq-blue);
+}
+
+.preview__meta,
+.preview__note {
+  font-size: 0.875rem;
+  color: #52607a;
+}
+
+.preview__note {
+  margin: 8px 0 0;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .preview {
+    position: static;
+    order: -1;
+    max-width: 420px;
+  }
+}
+
+@media (max-width: 560px) {
+  .form {
+    padding: 14px;
+  }
+  .group {
+    grid-template-columns: 1fr;
+  }
+}
