@@ -1,0 +1,114 @@
+<section class="hero">
+  <div>
+    <h1>Flota de maquinaria</h1>
+    <p class="hero__subtitle">Consulta, agrega y actualiza los equipos de la flota.</p>
+  </div>
+</section>
+
+<!-- Contadores por estado (clic para filtrar) -->
+<div class="counters" role="group" aria-label="Filtrar por estado">
+  <button type="button" class="counter counter--total" [class.counter--active]="!statusFilter()"
+          (click)="toggleStatus('')" [attr.aria-pressed]="!statusFilter()">
+    <span class="counter__value">{{ service.machines().length }}</span>
+    <span class="counter__label">Total equipos</span>
+  </button>
+  @for (s of statuses; track s.value) {
+    <button type="button" class="counter counter--{{ s.value }}" [class.counter--active]="statusFilter() === s.value"
+            (click)="toggleStatus(s.value)" [attr.aria-pressed]="statusFilter() === s.value">
+      <span class="counter__value">{{ counts()[s.value] }}</span>
+      <span class="counter__label">{{ s.label }}</span>
+    </button>
+  }
+</div>
+
+<!-- Buscador y filtros -->
+<div class="filters">
+  <mat-form-field appearance="outline" class="filters__search" subscriptSizing="dynamic">
+    <mat-label>Buscar por nombre, marca o modelo</mat-label>
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput type="search" [ngModel]="search()" (ngModelChange)="setSearch($event)"
+           placeholder="Ej.: volqueta, Caterpillar, 320" autocomplete="off" />
+    @if (search()) {
+      <button matSuffix mat-icon-button type="button" aria-label="Limpiar búsqueda" (click)="setSearch('')">
+        <mat-icon>close</mat-icon>
+      </button>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="filters__select" subscriptSizing="dynamic">
+    <mat-label>Tipo de equipo</mat-label>
+    <mat-select [value]="typeFilter()" (valueChange)="setType($event)">
+      <mat-option value="">Todos los tipos</mat-option>
+      @for (t of types; track t.value) {
+        <mat-option [value]="t.value">{{ t.label }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="filters__select" subscriptSizing="dynamic">
+    <mat-label>Estado</mat-label>
+    <mat-select [value]="statusFilter()" (valueChange)="setStatus($event)">
+      <mat-option value="">Todos los estados</mat-option>
+      @for (s of statuses; track s.value) {
+        <mat-option [value]="s.value">{{ s.label }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>
+
+@if (service.loading() && !service.machines().length) {
+  <div class="state-box" role="status">
+    <mat-spinner diameter="44" />
+    <p>Cargando equipos…</p>
+  </div>
+} @else if (service.error() && !service.machines().length) {
+  <div class="state-box state-box--error" role="alert">
+    <mat-icon>cloud_off</mat-icon>
+    <p>{{ service.error() }}</p>
+    <button mat-flat-button type="button" (click)="retry()">
+      <mat-icon>refresh</mat-icon> Reintentar
+    </button>
+  </div>
+} @else if (!service.machines().length) {
+  <div class="state-box">
+    <mat-icon>inventory_2</mat-icon>
+    <p>Aún no hay equipos registrados.</p>
+    <a mat-flat-button routerLink="/maquinaria/nueva"><mat-icon>add</mat-icon> Agregar el primero</a>
+  </div>
+} @else {
+  <p class="results-info" aria-live="polite">
+    @if (hasFilters()) {
+      {{ filtered().length }} de {{ service.machines().length }} equipos
+      <button mat-button type="button" (click)="clearFilters()">Quitar filtros</button>
+    } @else {
+      {{ service.machines().length }} equipos en la flota
+    }
+  </p>
+
+  @if (!filtered().length) {
+    <div class="state-box">
+      <mat-icon>search_off</mat-icon>
+      <p>No se encontraron equipos con esos criterios.</p>
+      <button mat-stroked-button type="button" (click)="clearFilters()">Quitar filtros</button>
+    </div>
+  } @else {
+    <ul class="grid">
+      @for (m of filtered(); track m.id) {
+        <li>
+          <a class="card" [routerLink]="['/maquinaria', m.id]">
+            <div class="card__media">
+              <img appMachineImage [image]="m.image" [type]="m.type" [alt]="m.title" width="400" height="260" />
+              <span class="status-badge status-badge--{{ m.status }} card__status">{{ statusLabel(m.status) }}</span>
+            </div>
+            <div class="card__body">
+              <span class="card__type">{{ typeLabel(m.type) }}</span>
+              <h2 class="card__title">{{ m.title }}</h2>
+              <p class="card__meta">{{ m.brand }} {{ m.model }} · {{ m.year }}</p>
+              <p class="card__location"><mat-icon inline>place</mat-icon> {{ m.location }}</p>
+            </div>
+          </a>
+        </li>
+      }
+    </ul>
+  }
+}
