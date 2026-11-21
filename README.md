@@ -37,7 +37,7 @@ mobile/    App móvil (Flutter): login MASSEQ
 - **Web:** Angular 21 (componentes standalone, signals, control flow `@if/@for`, zoneless),
   Angular Material 21 (tema M3 *azure*), formularios reactivos, `HttpClient` con `withFetch()`,
   rutas *lazy* con `withComponentInputBinding()`, `rxResource`.
-- **Móvil:** Flutter 3.41 (Material 3), `flutter_svg`, `flutter_secure_storage`, `cryptography`, `flutter_launcher_icons`.
+- **Móvil:** Flutter 3.41 (Material 3), `http`, `flutter_secure_storage`, `cryptography`, `flutter_launcher_icons`.
 - **Despliegue:** Vercel (web) y Render (API).
 
 ## Cómo ejecutar en local
@@ -130,9 +130,13 @@ Los errores de validación responden `400` con `{ "message": "...", "errors": ["
 App **MASSEQ Login** en `mobile/` (proyecto `juan_eduardo_diaz`, paquete `co.masseq.juan_eduardo_diaz`),
 hecha con Flutter 3.41.7 (Dart 3.11).
 
-| Login | Credenciales incorrectas | Bloqueo tras 5 intentos | Inicio |
-| --- | --- | --- | --- |
-| ![Login](mobile/docs/screenshots/android_login.jpg) | ![Error](mobile/docs/screenshots/android_error.jpg) | ![Bloqueo](mobile/docs/screenshots/android_lock.jpg) | ![Inicio](mobile/docs/screenshots/android_home.jpg) |
+| Login | Credenciales incorrectas | Bloqueo tras 5 intentos |
+| --- | --- | --- |
+| ![Login](mobile/docs/screenshots/android_login.jpg) | ![Error](mobile/docs/screenshots/android_error.jpg) | ![Bloqueo](mobile/docs/screenshots/android_lock.jpg) |
+
+| Inicio: resumen de la flota | Inicio: líneas de negocio |
+| --- | --- |
+| ![Inicio](mobile/docs/screenshots/android_home.jpg) | ![Inicio, parte inferior](mobile/docs/screenshots/android_home_2.jpg) |
 
 *Capturas tomadas en el emulador de Android con el APK de release.*
 
@@ -141,8 +145,9 @@ hecha con Flutter 3.41.7 (Dart 3.11).
 ### Qué incluye
 
 - Réplica de la pantalla de login: insignia de MASSEQ (`assets/brand/logo-masseq-insignia.png`), título
-  **LOGIN**, campos *Username* y *Password* con borde, botón **Ingresar** azul `#0057A8`, ilustración de la volqueta (recortada de `backend/public/images/volqueta.svg`, con
-  `flutter_svg`) y el pie *"Desarrollado por Masseq"* / *"App: Juan Eduardo Díaz Martínez"*.
+  **LOGIN**, campos *Username* y *Password* con borde, botón **Ingresar** azul `#0057A8`, ilustración de la
+  volqueta (`assets/images/volqueta.png`, fondo transparente) y pie oscuro como el de la web:
+  *"MASSEQ | CONSTRUIMOS CONFIANZA"* y *"© 2026 Masseq Proyectos e Ingeniería S.A.S."*.
 - Responsive y sin desbordes con el teclado (`SafeArea` + `SingleChildScrollView`, ancho máximo 380 px).
 - **Bonus:**
   1. Contraseña enmascarada con `•` (`obscureText` + `obscuringCharacter`).
@@ -151,16 +156,23 @@ hecha con Flutter 3.41.7 (Dart 3.11).
      la contraseña se deriva con **PBKDF2-HMAC-SHA256** (100.000 iteraciones, sal aleatoria), nunca en texto
      plano. Mensajes en español (campos vacíos y *"Usuario o contraseña incorrectos"*, texto de error +
      `SnackBar`), bloqueo de 30 s tras 5 intentos; el botón se deshabilita y muestra un loader mientras valida. Si el login es
-     correcto se abre la pantalla de inicio (*"Bienvenido, admin"*) con **Cerrar sesión**.
+     correcto se abre la pantalla de inicio.
   4. Ícono propio generado con `flutter_launcher_icons` a partir de un PNG 1024×1024 compuesto por script
      con la insignia sobre azul `#0057A8` (`mobile/tool/generate_icon.py`, Pillow), con ícono adaptativo en
      Android. Nombre visible: **MASSEQ Login**.
+- **Pantalla de inicio:** encabezado con la insignia, *"Hola, admin"* y la fecha en español;
+  **Resumen de la flota** (total, disponibles, en obra y en mantenimiento) calculado con los datos reales de
+  `GET https://masseq-flota-api.onrender.com/api/machines` (paquete `http`), con loader (Render gratuito puede
+  tardar ~1 min en despertar), mensaje de error con **Reintentar** (incluye el 429 del rate limit);
+  **Líneas de negocio** de web.masseq.com.co (Infraestructura vial, Hidrocarburos, Hidráulicos, Geotecnia y
+  Emergencias) y **Cerrar sesión**. Android declara el permiso `INTERNET`.
 - Identidad visual de MASSEQ: paleta de la marca y fuentes **Poppins**, **Barlow Semi Condensed** y
-  **Nunito Sans** incluidas como assets (`mobile/assets/fonts`, licencia OFL), sin `google_fonts`: la app
-  funciona sin internet.
+  **Nunito Sans** incluidas como assets (`mobile/assets/fonts`, licencia OFL), sin `google_fonts`: el login
+  funciona sin internet (solo el resumen de la flota necesita conexión).
 
 Estructura: `lib/main.dart`, `lib/theme.dart`, `lib/screens/` (login e inicio),
-`lib/services/auth_service.dart`, `lib/widgets/` (insignia y pie), `test/widget_test.dart`.
+`lib/services/` (`auth_service.dart`, `fleet_service.dart`), `lib/widgets/` (insignia, volqueta y pie),
+`test/widget_test.dart` (la API se simula con `MockClient`).
 
 ### Cómo ejecutar
 

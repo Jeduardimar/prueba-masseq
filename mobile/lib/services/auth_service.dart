@@ -27,27 +27,32 @@ class LoginResult {
 
   /// Mensaje en español. Nunca revela si el usuario existe.
   String? get message => switch (status) {
-        LoginStatus.success => null,
-        LoginStatus.emptyFields => 'Ingresa el usuario y la contraseña.',
-        LoginStatus.invalidCredentials => 'Usuario o contraseña incorrectos.',
-        LoginStatus.locked =>
-          'Demasiados intentos fallidos. Intenta de nuevo en '
-              '${lockedFor.inSeconds.clamp(1, 999)} s.',
-      };
+    LoginStatus.success => null,
+    LoginStatus.emptyFields => 'Ingresa el usuario y la contraseña.',
+    LoginStatus.invalidCredentials => 'Usuario o contraseña incorrectos.',
+    LoginStatus.locked =>
+      'Demasiados intentos fallidos. Intenta de nuevo en '
+          '${lockedFor.inSeconds.clamp(1, 999)} s.',
+  };
 }
 
 /// Deriva la clave de una contraseña con PBKDF2-HMAC-SHA256.
-typedef KeyDerivation = Future<List<int>> Function(
-    String password, List<int> salt, int iterations);
+typedef KeyDerivation =
+    Future<List<int>> Function(String password, List<int> salt, int iterations);
 
 /// Por defecto PBKDF2 se ejecuta fuera del hilo de la UI con [compute].
 Future<List<int>> derivePbkdf2InBackground(
-        String password, List<int> salt, int iterations) =>
-    compute(_derivePbkdf2, _KdfJob(password, salt, iterations));
+  String password,
+  List<int> salt,
+  int iterations,
+) => compute(_derivePbkdf2, _KdfJob(password, salt, iterations));
 
 /// PBKDF2 en el mismo hilo (útil en tests).
-Future<List<int>> pbkdf2Sha256(String password, List<int> salt, int iterations) =>
-    _derivePbkdf2(_KdfJob(password, salt, iterations));
+Future<List<int>> pbkdf2Sha256(
+  String password,
+  List<int> salt,
+  int iterations,
+) => _derivePbkdf2(_KdfJob(password, salt, iterations));
 
 /// Parámetros de PBKDF2 para [compute].
 class _KdfJob {
@@ -80,9 +85,9 @@ class AuthService {
     this.validationDelay = const Duration(milliseconds: 300),
     DateTime Function()? clock,
     KeyDerivation? deriveKey,
-  })  : _storage = storage ?? const FlutterSecureStorage(),
-        _now = clock ?? DateTime.now,
-        _deriveKey = deriveKey ?? derivePbkdf2InBackground;
+  }) : _storage = storage ?? const FlutterSecureStorage(),
+       _now = clock ?? DateTime.now,
+       _deriveKey = deriveKey ?? derivePbkdf2InBackground;
 
   static const defaultIterations = 100000;
   static const maxAttempts = 5;
@@ -152,12 +157,14 @@ class AuthService {
     final salt = base64Decode((await _storage.read(key: _kSalt))!);
     final storedHash = base64Decode((await _storage.read(key: _kHash))!);
     final rounds =
-        int.tryParse(await _storage.read(key: _kIterations) ?? '') ?? iterations;
+        int.tryParse(await _storage.read(key: _kIterations) ?? '') ??
+        iterations;
 
     // Se deriva la clave aunque el usuario no exista, para que el tiempo de
     // respuesta no revele qué usuarios existen.
     final candidate = await _deriveKey(password, salt, rounds);
-    final ok = _constantTimeEquals(candidate, storedHash) &
+    final ok =
+        _constantTimeEquals(candidate, storedHash) &
         _constantTimeEquals(utf8.encode(user), utf8.encode(storedUser ?? ''));
 
     final elapsed = _now().difference(started);

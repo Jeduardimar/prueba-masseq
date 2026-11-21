@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Necesario para leer el resumen de la flota desde la API. -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="MASSEQ Login"
         android:allowBackup="false"

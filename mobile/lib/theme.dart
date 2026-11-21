@@ -12,11 +12,15 @@ abstract final class MasseqColors {
   static const muted = Color(0xFF5A5A5A);
   static const background = Color(0xFFFFFFFF);
   static const surface = Color(0xFFF5F6F8);
+  static const footer = Color(0xFF111111);
+
+  /// Colores de estado (los mismos de la web).
+  static const statusAvailable = Color(0xFF166B33);
+  static const statusOnSite = Color(0xFF0057A8);
+  static const statusMaintenance = Color(0xFF9A5B00);
 
   /// Degradado de acento amarillo → naranja → azul.
-  static const accentGradient = LinearGradient(
-    colors: [yellow, orange, blue],
-  );
+  static const accentGradient = LinearGradient(colors: [yellow, orange, blue]);
 }
 
 /// Familias tipográficas incluidas como assets (ver pubspec.yaml).
@@ -51,10 +55,7 @@ ThemeData buildMasseqTheme() {
     colorScheme: scheme,
     scaffoldBackgroundColor: MasseqColors.background,
     textTheme: base.textTheme
-        .apply(
-          bodyColor: MasseqColors.text,
-          displayColor: MasseqColors.title,
-        )
+        .apply(bodyColor: MasseqColors.text, displayColor: MasseqColors.title)
         .copyWith(
           headlineMedium: const TextStyle(
             fontFamily: MasseqFonts.title,

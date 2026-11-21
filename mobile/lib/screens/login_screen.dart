@@ -1,17 +1,23 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../services/auth_service.dart';
-import '../widgets/developer_footer.dart';
+import '../services/fleet_service.dart';
+import '../widgets/masseq_footer.dart';
 import '../widgets/masseq_logo.dart';
+import '../widgets/volqueta_image.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, required this.authService});
+  const LoginScreen({
+    super.key,
+    required this.authService,
+    required this.fleetService,
+  });
 
   final AuthService authService;
+  final FleetService fleetService;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -88,6 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
           builder: (_) => HomeScreen(
             username: username,
             authService: widget.authService,
+            fleetService: widget.fleetService,
           ),
         ),
       );
@@ -109,6 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      bottomNavigationBar: const SafeArea(top: false, child: MasseqFooter()),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) => SingleChildScrollView(
@@ -116,7 +124,9 @@ class _LoginScreenState extends State<LoginScreen> {
             child: ConstrainedBox(
               // Centra verticalmente cuando hay espacio; con el teclado abierto
               // el contenido simplemente se desplaza.
-              constraints: BoxConstraints(minHeight: constraints.maxHeight - 48),
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight - 48,
+              ),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 380),
@@ -153,7 +163,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           validator: (v) => (v == null || v.trim().isEmpty)
                               ? 'Ingresa el usuario.'
                               : null,
-                          onFieldSubmitted: (_) => _passwordFocus.requestFocus(),
+                          onFieldSubmitted: (_) =>
+                              _passwordFocus.requestFocus(),
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
@@ -235,13 +246,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 32),
-                        SvgPicture.asset(
-                          'assets/images/volqueta.svg',
-                          height: 120,
-                          semanticsLabel: 'Ilustración de una volqueta',
-                        ),
-                        const SizedBox(height: 24),
-                        const DeveloperFooter(),
+                        const VolquetaImage(height: 130),
                       ],
                     ),
                   ),
