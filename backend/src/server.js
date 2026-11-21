@@ -6,6 +6,7 @@ const { rateLimit } = require('express-rate-limit');
 const store = require('./store');
 const { validateMachine } = require('./validation');
 const { TYPES, STATUSES, defaultImage } = require('./catalog');
+const { startHistory, transition } = require('./history');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -88,6 +89,11 @@ app.get('/', (_req, res) => {
       'GET    /api/catalog',
       'GET    /api/health',
     ],
+    fields: {
+      statusHistory:
+        'Solo lectura. Tramos [{ status, from, to }] con fechas ISO 8601; el último tramo es el estado actual ' +
+        '(to = null). Se abre un tramo nuevo cuando cambia el estado (PUT/PATCH) y se conservan los 50 más recientes.',
+    },
   });
 });
 
@@ -122,6 +128,7 @@ app.post(BASE, (req, res) => {
     return res.status(409).json({ message: `Se alcanzó el máximo de ${MAX_MACHINES} equipos. Elimina alguno antes de agregar otro.` });
   }
   if (!data.image) data.image = defaultImage(data.type);
+  data.statusHistory = startHistory(data.status);
   res.status(201).json(store.create(data));
 });
 
@@ -144,6 +151,10 @@ const updateHandler = (partial) => (req, res) => {
     if (!partial || (data.type && currentIsDefault)) {
       data.image = defaultImage(type);
     }
+  }
+  // Historial: solo cambia si cambia el estado (el cliente no puede enviarlo; la validación lo descarta).
+  if (data.status && data.status !== current.status) {
+    data.statusHistory = transition(current.statusHistory, data.status);
   }
   res.json(store.update(id, data));
 };

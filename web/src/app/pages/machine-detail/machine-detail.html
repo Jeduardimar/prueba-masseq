@@ -46,6 +46,48 @@
         <p>{{ m.description || 'Sin descripción.' }}</p>
       </section>
 
+      @if (segments().length) {
+        <section class="status-time" aria-labelledby="status-time-title">
+          <h2 id="status-time-title">Tiempo por estado</h2>
+          <ul class="status-bars">
+            @for (t of totals(); track t.status) {
+              <li class="status-bars__item">
+                <div class="status-bars__head">
+                  <span class="status-bars__label">
+                    <span class="status-dot status-dot--{{ t.status }}" aria-hidden="true"></span>{{ statusLabel(t.status) }}
+                  </span>
+                  <span class="status-bars__value">{{ formatDuration(t.ms) }} · {{ t.percent }} %</span>
+                </div>
+                <div class="status-bars__track" role="progressbar" [attr.aria-valuenow]="t.percent"
+                     aria-valuemin="0" aria-valuemax="100" [attr.aria-label]="statusLabel(t.status)">
+                  <div class="status-bars__fill status-bars__fill--{{ t.status }}" [style.width.%]="t.percent"></div>
+                </div>
+              </li>
+            }
+          </ul>
+
+          <h3 class="status-time__subtitle">Historial</h3>
+          <ol class="timeline">
+            @for (s of segments(); track s.from) {
+              <li class="timeline__item timeline__item--{{ s.status }}">
+                <div class="timeline__head">
+                  <span class="status-badge status-badge--{{ s.status }}">{{ statusLabel(s.status) }}</span>
+                  <span class="timeline__duration">{{ formatDuration(s.ms) }}</span>
+                </div>
+                <p class="timeline__dates">
+                  Desde {{ formatDateTime(s.from) }}
+                  @if (s.current) {
+                    · <strong>estado actual</strong>
+                  } @else {
+                    · hasta {{ formatDateTime(s.to!) }}
+                  }
+                </p>
+              </li>
+            }
+          </ol>
+        </section>
+      }
+
       <div class="actions">
         <a mat-flat-button [routerLink]="['/maquinaria', m.id, 'editar']">
           <mat-icon>edit</mat-icon> Editar

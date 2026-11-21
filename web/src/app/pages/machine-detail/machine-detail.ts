@@ -11,6 +11,8 @@ import { filter, switchMap } from 'rxjs';
 import { MachineService, errorMessage } from '../../core/machine.service';
 import { MACHINE_STATUSES, MachineStatus, statusLabel, typeLabel } from '../../core/machine.model';
 import { StatusChanger } from '../../core/status-changer';
+import { Clock } from '../../core/clock';
+import { formatDateTime, formatDuration, timeline, totalsByStatus } from '../../core/status-time';
 import { MachineImage } from '../../shared/machine-image';
 import { ConfirmDialog, ConfirmDialogData } from '../../shared/confirm-dialog';
 
@@ -33,6 +35,7 @@ export class MachineDetail {
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly statusChanger = inject(StatusChanger);
+  private readonly clock = inject(Clock);
 
   /** Parámetro :id de la ruta (withComponentInputBinding). */
   readonly id = input.required<string>();
@@ -58,6 +61,12 @@ export class MachineDetail {
 
   protected readonly deleting = signal(false);
   protected readonly statuses = MACHINE_STATUSES;
+  protected readonly formatDuration = formatDuration;
+  protected readonly formatDateTime = formatDateTime;
+
+  /** Tiempo acumulado por estado y tramos; el tramo abierto se mide contra el reloj. */
+  protected readonly totals = computed(() => totalsByStatus(this.machine()?.statusHistory, this.clock.now()));
+  protected readonly segments = computed(() => timeline(this.machine()?.statusHistory, this.clock.now()));
   protected readonly savingStatus = computed(() => this.service.savingStatus().has(this.machineId()));
   protected readonly typeLabel = typeLabel;
   protected readonly statusLabel = statusLabel;
@@ -66,7 +75,10 @@ export class MachineDetail {
   protected changeStatus(status: MachineStatus): void {
     const m = this.machine();
     if (!m) return;
-    this.statusChanger.change(m, status, (updated) => this.resource.set(updated));
+    this.statusChanger.change(m, status, (updated) => {
+      this.resource.set(updated);
+      this.clock.tick();
+    });
   }
 
   protected retry(): void {

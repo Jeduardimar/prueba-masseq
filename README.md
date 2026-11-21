@@ -21,7 +21,9 @@ buscar, ver el detalle, agregar, editar y eliminar equipos.
 > **Nota sobre Render gratuito:** el servidor se duerme tras unos minutos sin uso; la primera petición
 > puede tardar hasta un minuto (la web muestra el aviso *"Conectando con el servidor…"*). Además, el
 > disco no es persistente: **los cambios (equipos creados, editados o eliminados) se pierden cuando el
-> servidor se reinicia** y los datos vuelven a los 14 equipos iniciales de `data/seed.json`.
+> servidor se reinicia** y los datos vuelven a los 14 equipos iniciales de `data/seed.json`. Esto incluye el
+> **historial de estados** (`statusHistory`): tras un reinicio vuelve al historial de ejemplo del seed y se
+> pierden los cambios de estado registrados desde entonces.
 
 ## Estructura del monorepo
 
@@ -51,6 +53,7 @@ cd backend
 npm install
 npm run dev      # recarga automática; o "npm start"
 npm run reset    # restaura data/db.json con los datos iniciales
+npm test         # pruebas del historial de estados (node --test)
 ```
 
 ### 2. Web (puerto 4200)
@@ -60,6 +63,7 @@ cd web
 npm install      # el .npmrc incluye legacy-peer-deps
 npm start        # ng serve → http://localhost:4200
 npm run build    # compila a dist/web/browser
+npm test         # pruebas unitarias (Vitest)
 ```
 
 La web usa `http://localhost:3000` cuando corre en `localhost` y la API de Render en cualquier otro host
@@ -81,13 +85,23 @@ Modelo de un equipo:
   "status": "en_obra",
   "location": "Obra vial – Tramo Tesalia–Paicol",
   "description": "…",
-  "image": "/images/volqueta.jpg"
+  "image": "/images/volqueta.jpg",
+  "statusHistory": [
+    { "status": "disponible", "from": "2026-07-21T20:45:00.000Z", "to": "2026-08-16T12:00:00.000Z" },
+    { "status": "en_obra", "from": "2026-08-16T12:00:00.000Z", "to": null }
+  ]
 }
 ```
 
 - `type`: `volqueta | retroexcavadora | excavadora | motoniveladora | vibrocompactador | cargador | bulldozer | carrotanque | trituradora`
 - `status`: `disponible | en_obra | mantenimiento`
 - `image` (opcional): URL `http(s)` o una imagen propia `/images/<nombre>.jpg|.svg`. Si se omite, se asigna la foto del tipo (`/images/<tipo>.jpg`).
+- `statusHistory` (solo lectura): tramos `{ status, from, to }` con fechas ISO 8601 en orden cronológico; el
+  último es el estado actual y tiene `to: null`. `POST` lo crea con el estado inicial; `PUT`/`PATCH` cierran el
+  tramo actual y abren uno nuevo **solo si cambia el estado**. El cliente no puede enviarlo (la validación lo
+  descarta) y se conservan los 50 tramos más recientes. El seed trae un historial de ejemplo de 2 a 5 tramos
+  (últimos ~120 días, fechas fijas) y, al arrancar, a los equipos sin historial se les crea uno desde ese
+  momento (migración en `store.load()`). Lógica en `backend/src/history.js`, con pruebas (`npm test`).
 
 | Método | Ruta | Descripción |
 | --- | --- | --- |
@@ -95,7 +109,7 @@ Modelo de un equipo:
 | GET | `/api/machines/:id` | Detalle de un equipo |
 | POST | `/api/machines` | Crea un equipo (201) |
 | PUT | `/api/machines/:id` | Reemplaza un equipo; sin imagen → foto del tipo |
-| PATCH | `/api/machines/:id` | Actualiza parcialmente; si cambia el tipo y la imagen era una ilustración, se ajusta |
+| PATCH | `/api/machines/:id` | Actualiza parcialmente (p. ej. `{ "status": "en_obra" }`); si cambia el tipo y la imagen era una ilustración, se ajusta |
 | DELETE | `/api/machines/:id` | Elimina un equipo (204) |
 | GET | `/api/catalog` | Tipos y estados válidos |
 | GET | `/api/health` | Estado del servicio |
@@ -114,6 +128,15 @@ Los errores de validación responden `400` con `{ "message": "...", "errors": ["
 - [x] **Editar** equipo (`/maquinaria/:id/editar`); los cambios se ven en el listado y en el detalle.
 - [x] **Eliminar** con diálogo de confirmación; desaparece del listado.
 - [x] `MachineService` con `HttpClient` y un signal `machines` que se actualiza tras crear, editar o eliminar.
+- [x] **Cambio rápido de estado** sin entrar a editar: en la tarjeta, la etiqueta de estado abre un menú con los
+  3 estados (sin navegar al detalle); en el detalle, un grupo de botones. Usa `PATCH { status }`
+  (`MachineService.updateStatus`), muestra un loader mientras guarda y un snackbar *"Estado actualizado a X"*
+  con **Deshacer**; los errores (incluido el 429 del rate limit) se muestran en español.
+- [x] **Tiempo en cada estado:** la tarjeta indica cuánto lleva en el estado actual (*"Disponible hace 3 d 4 h"*)
+  y el detalle muestra **Tiempo por estado** (barras con el total y el porcentaje de cada estado) y el
+  historial de tramos (desde, hasta y duración, fechas en es-CO). El tramo abierto se recalcula cada 30 s sin
+  recargar y se actualiza al instante tras un cambio rápido. Cálculos puros en `core/status-time.ts` con
+  pruebas unitarias (`npm test`, Vitest).
 - [x] Formulario reactivo con validaciones y mensajes en español, y **vista previa** de la imagen.
 - [x] Imágenes relativas (`/images/...`) resueltas contra la API; si una imagen falla se usa la foto del tipo (`.jpg`) y, si también falla, su ilustración (`.svg`).
 - [x] Estados de **carga**, **error** (con reintentar) y **sin resultados**; aviso si la API tarda más de 3 s.

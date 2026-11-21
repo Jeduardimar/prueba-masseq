@@ -7,12 +7,16 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+import { Clock } from '../../core/clock';
 import { MachineService } from '../../core/machine.service';
+import { formatDuration, timeInCurrentStatus } from '../../core/status-time';
 import {
   MACHINE_STATUSES,
   MACHINE_TYPES,
+  Machine,
   MachineStatus,
   normalize,
+  statusLabel,
   typeLabel,
 } from '../../core/machine.model';
 import { MachineImage } from '../../shared/machine-image';
@@ -38,6 +42,7 @@ import { StatusMenu } from '../../shared/status-menu';
 export class MachineList {
   private readonly router = inject(Router);
   protected readonly service = inject(MachineService);
+  private readonly clock = inject(Clock);
 
   protected readonly types = MACHINE_TYPES;
   protected readonly statuses = MACHINE_STATUSES;
@@ -79,6 +84,12 @@ export class MachineList {
 
   constructor() {
     this.service.load();
+  }
+
+  /** "Disponible hace 3 d 4 h": tiempo en el estado actual (se recalcula con el reloj). */
+  protected sinceText(m: Machine): string | null {
+    const ms = timeInCurrentStatus(m.statusHistory, this.clock.now());
+    return ms === null ? null : `${statusLabel(m.status)} hace ${formatDuration(ms)}`;
   }
 
   protected setSearch(value: string): void {

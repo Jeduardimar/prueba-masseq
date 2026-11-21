@@ -5,6 +5,7 @@
  */
 const fs = require('fs');
 const path = require('path');
+const { ensureHistory } = require('./history');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
@@ -22,7 +23,11 @@ function load() {
   if (!fs.existsSync(DB_FILE)) {
     fs.copyFileSync(SEED_FILE, DB_FILE);
   }
-  items = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+  const raw = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+  // Migración: los equipos sin statusHistory reciben uno desde ahora.
+  const now = new Date();
+  items = raw.map((m) => ensureHistory(m, now));
+  if (items.some((m, i) => m !== raw[i])) persist();
 }
 
 function persist() {

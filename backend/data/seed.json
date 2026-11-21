@@ -10,7 +10,34 @@
     "status": "en_obra",
     "location": "Obra vial – Tramo Tesalia–Paicol",
     "description": "Volqueta doble troque para transporte de agregados y material de excavación. Caja reforzada y sistema de volteo hidráulico.",
-    "image": "/images/volqueta.jpg"
+    "image": "/images/volqueta.jpg",
+    "statusHistory": [
+      {
+        "status": "disponible",
+        "from": "2026-07-21T20:45:00.000Z",
+        "to": "2026-08-16T12:00:00.000Z"
+      },
+      {
+        "status": "mantenimiento",
+        "from": "2026-08-16T12:00:00.000Z",
+        "to": "2026-08-30T20:15:00.000Z"
+      },
+      {
+        "status": "disponible",
+        "from": "2026-08-30T20:15:00.000Z",
+        "to": "2026-09-18T18:45:00.000Z"
+      },
+      {
+        "status": "mantenimiento",
+        "from": "2026-09-18T18:45:00.000Z",
+        "to": "2026-10-04T13:45:00.000Z"
+      },
+      {
+        "status": "en_obra",
+        "from": "2026-10-04T13:45:00.000Z",
+        "to": null
+      }
+    ]
   },
   {
     "id": 2,
@@ -23,7 +50,29 @@
     "status": "disponible",
     "location": "Planta Tesalia (Km 5 Vía Tesalia–Neiva)",
     "description": "Unidad de transporte de material pétreo desde planta hacia frentes de obra.",
-    "image": "/images/volqueta.jpg"
+    "image": "/images/volqueta.jpg",
+    "statusHistory": [
+      {
+        "status": "disponible",
+        "from": "2026-07-26T17:00:00.000Z",
+        "to": "2026-09-02T12:15:00.000Z"
+      },
+      {
+        "status": "en_obra",
+        "from": "2026-09-02T12:15:00.000Z",
+        "to": "2026-10-12T21:45:00.000Z"
+      },
+      {
+        "status": "mantenimiento",
+        "from": "2026-10-12T21:45:00.000Z",
+        "to": "2026-10-26T19:15:00.000Z"
+      },
+      {
+        "status": "disponible",
+        "from": "2026-10-26T19:15:00.000Z",
+        "to": null
+      }
+    ]
   },
   {
     "id": 3,
@@ -36,7 +85,19 @@
     "status": "mantenimiento",
     "location": "Taller central – Neiva",
     "description": "Volqueta sencilla para despachos urbanos y obras menores. En cambio de llantas y revisión de frenos.",
-    "image": "/images/volqueta.jpg"
+    "image": "/images/volqueta.jpg",
+    "statusHistory": [
+      {
+        "status": "en_obra",
+        "from": "2026-07-30T16:30:00.000Z",
+        "to": "2026-10-21T21:45:00.000Z"
+      },
+      {
+        "status": "mantenimiento",
+        "from": "2026-10-21T21:45:00.000Z",
+        "to": null
+      }
+    ]
   },
   {
     "id": 4,
@@ -49,7 +110,19 @@
     "status": "en_obra",
     "location": "Obra de alcantarillado – Neiva",
     "description": "Retroexcavadora 4x4 para zanjas, cargue de material y obras de redes.",
-    "image": "/images/retroexcavadora.jpg"
+    "image": "/images/retroexcavadora.jpg",
+    "statusHistory": [
+      {
+        "status": "disponible",
+        "from": "2026-08-01T18:00:00.000Z",
+        "to": "2026-09-03T17:45:00.000Z"
+      },
+      {
+        "status": "en_obra",
+        "from": "2026-09-03T17:45:00.000Z",
+        "to": null
+      }
+    ]
   },
   {
     "id": 5,
@@ -62,7 +135,34 @@
     "status": "disponible",
     "location": "Patio de maquinaria – Neiva",
     "description": "Equipo versátil para excavación y cargue en espacios reducidos.",
-    "image": "/images/retroexcavadora.jpg"
+    "image": "/images/retroexcavadora.jpg",
+    "statusHistory": [
+      {
+        "status": "en_obra",
+        "from": "2026-07-29T16:30:00.000Z",
+        "to": "2026-09-07T12:15:00.000Z"
+      },
+      {
+        "status": "mantenimiento",
+        "from": "2026-09-07T12:15:00.000Z",
+        "to": "2026-09-18T20:15:00.000Z"
+      },
+      {
+        "status": "disponible",
+        "from": "2026-09-18T20:15:00.000Z",
+        "to": "2026-10-05T16:45:00.000Z"
+      },
+      {
+        "status": "en_obra",
+        "from": "2026-10-05T16:45:00.000Z",
+        "to": "2026-11-03T21:00:00.000Z"
+      },
+      {
+        "status": "disponible",
+        "from": "2026-11-03T21:00:00.000Z",
+        "to": null
+      }
+    ]
   },
   {
     "id": 6,
@@ -75,7 +175,29 @@
     "status": "en_obra",
     "location": "Frente de explotación – Planta Tesalia",
     "description": "Excavadora de 21 toneladas para extracción de material en cantera y cargue de volquetas.",
-    "image": "/images/excavadora.jpg"
+    "image": "/images/excavadora.jpg",
+    "statusHistory": [
+      {
+        "status": "disponible",
+        "from": "2026-07-22T20:00:00.000Z",
+        "to": "2026-08-09T19:30:00.000Z"
+      },
+      {
+        "status": "mantenimiento",
+        "from": "2026-08-09T19:30:00.000Z",
+        "to": "2026-08-22T13:45:00.000Z"
+      },
+      {
+        "status": "disponible",
+        "from": "2026-08-22T13:45:00.000Z",
+        "to": "2026-09-13T12:30:00.000Z"
+      },
+      {
+        "status": "en_obra",
+        "from": "2026-09-13T12:30:00.000Z",
+        "to": null
+      }
+    ]
   },
   {
     "id": 7,
@@ -88,7 +210,19 @@
     "status": "disponible",
     "location": "Planta Tesalia (Km 5 Vía Tesalia–Neiva)",
     "description": "Excavadora de nueva generación con bajo consumo de combustible.",
-    "image": "/images/excavadora.jpg"
+    "image": "/images/excavadora.jpg",
+    "statusHistory": [
+      {
+        "status": "en_obra",
+        "from": "2026-07-27T16:15:00.000Z",
+        "to": "2026-10-12T14:30:00.000Z"
+      },
+      {
+        "status": "disponible",
+        "from": "2026-10-12T14:30:00.000Z",
+        "to": null
+      }
+    ]
   },
   {
     "id": 8,
@@ -101,7 +235,29 @@
     "status": "en_obra",
     "location": "Mantenimiento de vías terciarias – Huila",
     "description": "Motoniveladora para conformación de vías, cunetas y extendido de base granular.",
-    "image": "/images/motoniveladora.jpg"
+    "image": "/images/motoniveladora.jpg",
+    "statusHistory": [
+      {
+        "status": "disponible",
+        "from": "2026-07-23T20:45:00.000Z",
+        "to": "2026-08-16T18:15:00.000Z"
+      },
+      {
+        "status": "en_obra",
+        "from": "2026-08-16T18:15:00.000Z",
+        "to": "2026-09-13T19:00:00.000Z"
+      },
+      {
+        "status": "disponible",
+        "from": "2026-09-13T19:00:00.000Z",
+        "to": "2026-09-29T14:00:00.000Z"
+      },
+      {
+        "status": "en_obra",
+        "from": "2026-09-29T14:00:00.000Z",
+        "to": null
+      }
+    ]
   },
   {
     "id": 9,
@@ -114,7 +270,34 @@
     "status": "disponible",
     "location": "Patio de maquinaria – Neiva",
     "description": "Compactador de suelos para bases, subbases y terraplenes.",
-    "image": "/images/vibrocompactador.jpg"
+    "image": "/images/vibrocompactador.jpg",
+    "statusHistory": [
+      {
+        "status": "en_obra",
+        "from": "2026-07-31T15:15:00.000Z",
+        "to": "2026-09-16T19:00:00.000Z"
+      },
+      {
+        "status": "disponible",
+        "from": "2026-09-16T19:00:00.000Z",
+        "to": "2026-10-02T17:30:00.000Z"
+      },
+      {
+        "status": "en_obra",
+        "from": "2026-10-02T17:30:00.000Z",
+        "to": "2026-10-28T16:15:00.000Z"
+      },
+      {
+        "status": "mantenimiento",
+        "from": "2026-10-28T16:15:00.000Z",
+        "to": "2026-11-08T21:45:00.000Z"
+      },
+      {
+        "status": "disponible",
+        "from": "2026-11-08T21:45:00.000Z",
+        "to": null
+      }
+    ]
   },
   {
     "id": 10,
@@ -127,7 +310,19 @@
     "status": "mantenimiento",
     "location": "Taller central – Neiva",
     "description": "Compactador en mantenimiento preventivo del sistema vibratorio.",
-    "image": "/images/vibrocompactador.jpg"
+    "image": "/images/vibrocompactador.jpg",
+    "statusHistory": [
+      {
+        "status": "en_obra",
+        "from": "2026-07-22T12:30:00.000Z",
+        "to": "2026-10-28T21:15:00.000Z"
+      },
+      {
+        "status": "mantenimiento",
+        "from": "2026-10-28T21:15:00.000Z",
+        "to": null
+      }
+    ]
   },
   {
     "id": 11,
@@ -140,7 +335,19 @@
     "status": "en_obra",
     "location": "Planta El Agrado (Tamarindo)",
     "description": "Cargador de ruedas para despacho de agregados y alimentación de la planta trituradora.",
-    "image": "/images/cargador.jpg"
+    "image": "/images/cargador.jpg",
+    "statusHistory": [
+      {
+        "status": "mantenimiento",
+        "from": "2026-07-20T16:00:00.000Z",
+        "to": "2026-08-18T18:45:00.000Z"
+      },
+      {
+        "status": "en_obra",
+        "from": "2026-08-18T18:45:00.000Z",
+        "to": null
+      }
+    ]
   },
   {
     "id": 12,
@@ -153,7 +360,24 @@
     "status": "en_obra",
     "location": "Adecuación de plataforma – Tolima",
     "description": "Tractor de orugas para movimiento de tierras, descapote y conformación de terraplenes.",
-    "image": "/images/bulldozer.jpg"
+    "image": "/images/bulldozer.jpg",
+    "statusHistory": [
+      {
+        "status": "mantenimiento",
+        "from": "2026-07-20T13:45:00.000Z",
+        "to": "2026-08-18T21:00:00.000Z"
+      },
+      {
+        "status": "disponible",
+        "from": "2026-08-18T21:00:00.000Z",
+        "to": "2026-10-07T13:45:00.000Z"
+      },
+      {
+        "status": "en_obra",
+        "from": "2026-10-07T13:45:00.000Z",
+        "to": null
+      }
+    ]
   },
   {
     "id": 13,
@@ -166,7 +390,19 @@
     "status": "disponible",
     "location": "Planta Tesalia (Km 5 Vía Tesalia–Neiva)",
     "description": "Carrotanque de agua para riego de vías, control de material particulado y humectación en compactación.",
-    "image": "/images/carrotanque.jpg"
+    "image": "/images/carrotanque.jpg",
+    "statusHistory": [
+      {
+        "status": "en_obra",
+        "from": "2026-07-29T18:00:00.000Z",
+        "to": "2026-10-19T19:30:00.000Z"
+      },
+      {
+        "status": "disponible",
+        "from": "2026-10-19T19:30:00.000Z",
+        "to": null
+      }
+    ]
   },
   {
     "id": 14,
@@ -179,6 +415,18 @@
     "status": "en_obra",
     "location": "Planta Tesalia (Km 5 Vía Tesalia–Neiva)",
     "description": "Planta móvil de trituración primaria sobre orugas para producción de agregados (triturado, base y subbase granular).",
-    "image": "/images/trituradora.jpg"
+    "image": "/images/trituradora.jpg",
+    "statusHistory": [
+      {
+        "status": "disponible",
+        "from": "2026-07-26T16:00:00.000Z",
+        "to": "2026-09-11T14:30:00.000Z"
+      },
+      {
+        "status": "en_obra",
+        "from": "2026-09-11T14:30:00.000Z",
+        "to": null
+      }
+    ]
   }
 ]

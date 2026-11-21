@@ -11,6 +11,13 @@ export type MachineType =
 
 export type MachineStatus = 'disponible' | 'en_obra' | 'mantenimiento';
 
+/** Tramo del historial de estados (to = null en el tramo actual). */
+export interface StatusSegment {
+  status: MachineStatus;
+  from: string;
+  to: string | null;
+}
+
 export interface Machine {
   id: number;
   title: string;
@@ -24,10 +31,12 @@ export interface Machine {
   description: string;
   /** URL http(s) o imagen propia /images/<tipo>.jpg|.svg (opcional). */
   image?: string;
+  /** Historial de estados (solo lectura; lo calcula la API). */
+  statusHistory?: StatusSegment[];
 }
 
-/** Datos que se envían al crear o editar (sin id). */
-export type MachineInput = Omit<Machine, 'id'>;
+/** Datos que se envían al crear o editar (sin id ni historial). */
+export type MachineInput = Omit<Machine, 'id' | 'statusHistory'>;
 
 export interface Option<T extends string> {
   value: T;

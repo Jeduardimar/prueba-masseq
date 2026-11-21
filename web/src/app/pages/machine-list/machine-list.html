@@ -109,6 +109,9 @@
           <!-- Fuera del enlace (un botón no puede ir dentro de <a>); se superpone sobre la foto. -->
           <div class="card__status">
             <app-status-menu [machine]="m" />
+            @if (sinceText(m); as since) {
+              <span class="card__since">{{ since }}</span>
+            }
           </div>
         </li>
       }
