@@ -82,10 +82,15 @@ const updateHandler = (partial) => (req, res) => {
   const { errors, data } = validateMachine(req.body, partial);
   if (errors.length) return res.status(400).json({ message: 'Datos inválidos.', errors });
 
-  // Si no envían imagen y la actual es una ilustración por defecto, se ajusta al nuevo tipo
-  const type = data.type || current.type;
-  if (!data.image && (!partial || data.type) && (!current.image || current.image.startsWith('/images/'))) {
-    data.image = defaultImage(type);
+  // Imagen cuando no se envía:
+  // - PUT (reemplazo completo): siempre la ilustración del tipo (si se borró la URL propia, no se conserva).
+  // - PATCH que cambia el tipo: solo si la imagen actual era una ilustración propia (/images/...).
+  if (!data.image) {
+    const type = data.type || current.type;
+    const currentIsDefault = !current.image || current.image.startsWith('/images/');
+    if (!partial || (data.type && currentIsDefault)) {
+      data.image = defaultImage(type);
+    }
   }
   res.json(store.update(id, data));
 };
