@@ -1,0 +1,135 @@
+@use '@angular/material' as mat;
+
+:root {
+  --masseq-blue: #1e4e9c;
+  --masseq-blue-dark: #163a75;
+  --masseq-yellow: #f5b400;
+  --content-width: 1200px;
+  --page-bg: #f3f5f9;
+
+  --status-disponible: #1b7f3b;
+  --status-disponible-bg: #e3f4e8;
+  --status-en_obra: #1e4e9c;
+  --status-en_obra-bg: #e3ecfa;
+  --status-mantenimiento: #9a5b00;
+  --status-mantenimiento-bg: #fff1d6;
+}
+
+html {
+  color-scheme: light;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$yellow-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--page-bg);
+  color: #1b1f27;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  color: #13233f;
+}
+
+a {
+  color: var(--masseq-blue);
+}
+
+/* Etiqueta de estado (disponible / en obra / mantenimiento) */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &--disponible {
+    color: var(--status-disponible);
+    background: var(--status-disponible-bg);
+  }
+  &--en_obra {
+    color: var(--status-en_obra);
+    background: var(--status-en_obra-bg);
+  }
+  &--mantenimiento {
+    color: var(--status-mantenimiento);
+    background: var(--status-mantenimiento-bg);
+  }
+}
+
+/* Bloques de estado: cargando / error / sin resultados */
+.state-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 16px;
+  text-align: center;
+  color: #4a5568;
+
+  > mat-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 48px;
+    color: #8a99b3;
+  }
+
+  &--error > mat-icon {
+    color: #c62828;
+  }
+
+  p {
+    margin: 0;
+    max-width: 520px;
+  }
+}
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
