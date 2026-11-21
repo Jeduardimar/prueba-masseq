@@ -14,35 +14,60 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 20px;
-  border-radius: 14px;
-  background: #fff;
-  border: 1px solid #e1e6ef;
 }
 
+/* Cada sección del formulario es una tarjeta con encabezado e ícono */
 .group {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   column-gap: 14px;
   row-gap: 4px;
   margin: 0;
-  padding: 0;
-  border: 0;
+  padding: 0 20px 12px;
+  border: 1px solid #e1e6ef;
+  border-radius: 14px;
+  background: #fff;
   min-width: 0;
-
-  legend {
-    padding: 0;
-    margin-bottom: 10px;
-    font-family: var(--font-label);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--masseq-blue);
-  }
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
 
   mat-form-field {
     width: 100%;
   }
+}
+
+/* float: la leyenda deja de "cortar" el borde y se comporta como un encabezado normal */
+.group__title {
+  float: left;
+  box-sizing: border-box;
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: calc(100% + 40px);
+  margin: 0 -20px 16px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #e8ecf3;
+  border-radius: 14px 14px 0 0;
+  background: #f7f9fc;
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--masseq-blue);
+
+  mat-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+    color: #8a99b3;
+  }
+}
+
+/* Asterisco de obligatorio discreto */
+.form ::ng-deep .mat-mdc-form-field-required-marker {
+  color: #8a99b3;
+  font-weight: 400;
 }
 
 .span-2 {
@@ -62,10 +87,23 @@ h1 {
 .form-actions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
-  padding-top: 8px;
-  border-top: 1px solid #e8ecf3;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+/* Botón primario destacado y secundario discreto */
+.submit-btn {
+  min-height: 48px;
+  padding: 0 28px;
+  font-size: 1rem;
+  box-shadow: 0 2px 6px rgb(0 87 168 / 0.25);
+}
+
+.cancel-btn {
+  min-height: 48px;
+  --mat-button-text-label-text-color: #52607a;
 }
 
 .preview {
@@ -155,10 +193,17 @@ h1 {
 }
 
 @media (max-width: 560px) {
-  .form {
-    padding: 14px;
-  }
   .group {
     grid-template-columns: 1fr;
+    padding: 0 14px 8px;
+  }
+  .group__title {
+    width: calc(100% + 28px);
+    margin: 0 -14px 14px;
+    padding: 12px 14px;
+  }
+  .form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
   }
 }

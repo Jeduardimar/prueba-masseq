@@ -9,12 +9,14 @@
 <div class="counters" role="group" aria-label="Filtrar por estado">
   <button type="button" class="counter counter--total" [class.counter--active]="!statusFilter()"
           (click)="toggleStatus('')" [attr.aria-pressed]="!statusFilter()">
+    <mat-icon class="counter__icon" aria-hidden="true">inventory_2</mat-icon>
     <span class="counter__value">{{ service.machines().length }}</span>
     <span class="counter__label">Total equipos</span>
   </button>
   @for (s of statuses; track s.value) {
     <button type="button" class="counter counter--{{ s.value }}" [class.counter--active]="statusFilter() === s.value"
             (click)="toggleStatus(s.value)" [attr.aria-pressed]="statusFilter() === s.value">
+      <mat-icon class="counter__icon" aria-hidden="true">@switch (s.value) { @case ('disponible') { check_circle } @case ('en_obra') { construction } @default { build } }</mat-icon>
       <span class="counter__value">{{ counts()[s.value] }}</span>
       <span class="counter__label">{{ s.label }}</span>
     </button>

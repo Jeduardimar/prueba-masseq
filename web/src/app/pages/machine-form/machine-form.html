@@ -23,7 +23,7 @@
   <div class="layout">
     <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <fieldset class="group">
-        <legend>Identificación</legend>
+        <legend class="group__title"><mat-icon aria-hidden="true">badge</mat-icon> Identificación</legend>
 
         <mat-form-field appearance="outline" class="span-2">
           <mat-label>Nombre del equipo</mat-label>
@@ -59,7 +59,7 @@
       </fieldset>
 
       <fieldset class="group">
-        <legend>Ficha técnica</legend>
+        <legend class="group__title"><mat-icon aria-hidden="true">engineering</mat-icon> Ficha técnica</legend>
 
         <mat-form-field appearance="outline">
           <mat-label>Marca</mat-label>
@@ -114,7 +114,7 @@
       </fieldset>
 
       <fieldset class="group">
-        <legend>Imagen</legend>
+        <legend class="group__title"><mat-icon aria-hidden="true">photo_camera</mat-icon> Imagen</legend>
 
         <mat-form-field appearance="outline" class="span-2">
           <mat-label>URL de la imagen (opcional)</mat-label>
@@ -140,8 +140,8 @@
       }
 
       <div class="form-actions">
-        <a mat-button [routerLink]="isEdit() ? ['/maquinaria', id()] : ['/']">Cancelar</a>
-        <button mat-flat-button type="submit" [disabled]="saving()">
+        <a mat-button class="cancel-btn" [routerLink]="isEdit() ? ['/maquinaria', id()] : ['/']">Cancelar</a>
+        <button mat-flat-button class="submit-btn" type="submit" [disabled]="saving()">
           @if (saving()) {
             <mat-spinner diameter="18" />
           } @else {

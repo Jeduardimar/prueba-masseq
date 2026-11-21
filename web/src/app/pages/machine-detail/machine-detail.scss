@@ -100,10 +100,20 @@
   margin-top: 8px;
 }
 
+/* Editar (azul, lápiz) y Eliminar (contorno rojo, papelera) con la misma altura */
+.action-btn {
+  height: 44px;
+  min-width: 132px;
+  padding: 0 20px;
+  --mat-button-filled-container-height: 44px;
+  --mat-button-outlined-container-height: 44px;
+}
+
 .delete-btn {
   --mat-button-outlined-label-text-color: #c62828;
   --mat-button-outlined-icon-color: #c62828;
-  --mat-button-outlined-outline-color: #e6a6a6;
+  --mat-button-outlined-outline-color: #c62828;
+  --mat-button-outlined-state-layer-color: #c62828;
 }
 
 @media (max-width: 760px) {
@@ -260,4 +270,10 @@
   margin: 4px 0 0;
   font-size: 0.85rem;
   color: #4a5568;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-bars__fill {
+    transition: none;
+  }
 }
