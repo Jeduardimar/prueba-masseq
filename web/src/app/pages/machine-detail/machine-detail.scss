@@ -38,8 +38,9 @@
 }
 
 .detail__type {
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-family: var(--font-label);
+  font-size: 0.9rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--masseq-blue);
@@ -56,8 +57,10 @@
   border-bottom: 1px solid #e8ecf3;
 
   dt {
-    font-size: 0.78rem;
-    color: #6b7891;
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #5a6579;
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }

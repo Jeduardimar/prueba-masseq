@@ -1,15 +1,27 @@
 @use '@angular/material' as mat;
+@use './theme-colors' as masseq;
 
+/* Identidad visual de MASSEQ (web.masseq.com.co) */
 :root {
-  --masseq-blue: #1e4e9c;
-  --masseq-blue-dark: #163a75;
-  --masseq-yellow: #f5b400;
+  --masseq-blue: #0057a8;
+  --masseq-blue-light: #0072b0;
+  --masseq-blue-dark: #003f7a;
+  --masseq-yellow: #f6b40e;
+  --masseq-orange: #e8642f;
+  --masseq-black: #000000;
+  --masseq-gradient: linear-gradient(90deg, #f6b40e 0%, #e8642f 50%, #0057a8 100%);
+  --title-color: #070200;
+  --text-color: #3f3f3f;
   --content-width: 1200px;
-  --page-bg: #f3f5f9;
+  --page-bg: #f5f6f8;
 
-  --status-disponible: #1b7f3b;
+  --font-title: 'Poppins', 'Nunito Sans', Arial, sans-serif;
+  --font-label: 'Barlow Semi Condensed', 'Nunito Sans', Arial, sans-serif;
+  --font-body: 'Nunito Sans', 'Helvetica Neue', Arial, sans-serif;
+
+  --status-disponible: #166b33;
   --status-disponible-bg: #e3f4e8;
-  --status-en_obra: #1e4e9c;
+  --status-en_obra: #0057a8;
   --status-en_obra-bg: #e3ecfa;
   --status-mantenimiento: #9a5b00;
   --status-mantenimiento-bg: #fff1d6;
@@ -20,11 +32,23 @@ html {
   @include mat.theme(
     (
       color: (
-        primary: mat.$azure-palette,
-        tertiary: mat.$yellow-palette,
+        primary: masseq.$primary-palette,
+        tertiary: masseq.$tertiary-palette,
       ),
-      typography: Roboto,
+      typography: (
+        plain-family: var(--font-body),
+        brand-family: var(--font-title),
+        bold-weight: 700,
+        medium-weight: 600,
+        regular-weight: 400,
+      ),
       density: 0,
+    )
+  );
+  // Primario exacto de la marca (la paleta tonal M3 lo aproxima a #135eaf).
+  @include mat.theme-overrides(
+    (
+      primary: #0057a8,
     )
   );
 }
@@ -36,16 +60,29 @@ body {
 
 body {
   margin: 0;
-  font-family: Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-body);
   background: var(--page-bg);
-  color: #1b1f27;
+  color: var(--text-color);
 }
 
+/* Títulos: Poppins 700 en mayúsculas */
 h1,
 h2,
 h3 {
   margin: 0;
-  color: #13233f;
+  color: var(--title-color);
+  font-family: var(--font-title);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+/* Subtítulos, etiquetas y nombres en tarjetas: Barlow Semi Condensed en mayúsculas */
+.label-font {
+  font-family: var(--font-label);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 a {

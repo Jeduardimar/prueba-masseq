@@ -8,6 +8,8 @@ buscar, ver el detalle, agregar, editar y eliminar equipos.
 
 > Los datos son **de ejemplo**; no corresponden a la flota real de MASSEQ.
 
+![Web: listado de la flota](docs/screenshots/web_listado.jpg)
+
 ## Despliegue
 
 | Parte | URL |
@@ -115,7 +117,12 @@ Los errores de validación responden `400` con `{ "message": "...", "errors": ["
 - [x] Formulario reactivo con validaciones y mensajes en español, y **vista previa** de la imagen.
 - [x] Imágenes relativas (`/images/...`) resueltas contra la API; si una imagen falla se usa la foto del tipo (`.jpg`) y, si también falla, su ilustración (`.svg`).
 - [x] Estados de **carga**, **error** (con reintentar) y **sin resultados**; aviso si la API tarda más de 3 s.
-- [x] Diseño responsive con la identidad de MASSEQ (azul `#1e4e9c`, acento amarillo `#f5b400`).
+- [x] Diseño responsive con la identidad visual de MASSEQ (según web.masseq.com.co): azul `#0057A8`,
+  amarillo `#F6B40E` (CTA), naranja `#E8642F`, encabezado negro con el logo, línea de acento con degradado
+  amarillo→naranja→azul y pie oscuro *"MASSEQ | CONSTRUIMOS CONFIANZA"*. Tipografías Poppins (títulos),
+  Barlow Semi Condensed (etiquetas y nombres) y Nunito Sans (texto). Tema de Angular Material generado con
+  `ng generate @angular/material:theme-color` y contraste WCAG AA revisado.
+- [x] Logo con fondo transparente generado por script (`web/scripts/make-brand-logo.py`).
 - [x] `vercel.json` con *rewrites* para las rutas de la SPA.
 
 ## Móvil (Flutter)
@@ -123,17 +130,18 @@ Los errores de validación responden `400` con `{ "message": "...", "errors": ["
 App **MASSEQ Login** en `mobile/` (proyecto `juan_eduardo_diaz`, paquete `co.masseq.juan_eduardo_diaz`),
 hecha con Flutter 3.41.7 (Dart 3.11).
 
-| Login (Android) | Error de validación | Inicio | Login (Chrome) |
+| Login | Credenciales incorrectas | Bloqueo tras 5 intentos | Inicio |
 | --- | --- | --- | --- |
-| ![Login](mobile/docs/screenshots/android_login.jpg) | ![Error](mobile/docs/screenshots/android_error.jpg) | ![Inicio](mobile/docs/screenshots/android_home.jpg) | ![Web](mobile/docs/screenshots/web_login.jpg) |
+| ![Login](mobile/docs/screenshots/android_login.jpg) | ![Error](mobile/docs/screenshots/android_error.jpg) | ![Bloqueo](mobile/docs/screenshots/android_lock.jpg) | ![Inicio](mobile/docs/screenshots/android_home.jpg) |
+
+*Capturas tomadas en el emulador de Android con el APK de release.*
 
 **Credenciales de demo:** usuario `admin`, contraseña `Masseq2026*`.
 
 ### Qué incluye
 
-- Réplica de la pantalla de login: logo de MASSEQ recreado con widgets (cuadrícula inclinada de bloques
-  azules y naranja), título **LOGIN**, campos *Username* y *Password* con borde, botón **Ingresar** azul
-  `#1E4E9C`, ilustración de la volqueta (recortada de `backend/public/images/volqueta.svg`, con
+- Réplica de la pantalla de login: insignia de MASSEQ (`assets/brand/logo-masseq-insignia.png`), título
+  **LOGIN**, campos *Username* y *Password* con borde, botón **Ingresar** azul `#0057A8`, ilustración de la volqueta (recortada de `backend/public/images/volqueta.svg`, con
   `flutter_svg`) y el pie *"Desarrollado por Masseq"* / *"App: Juan Eduardo Díaz Martínez"*.
 - Responsive y sin desbordes con el teclado (`SafeArea` + `SingleChildScrollView`, ancho máximo 380 px).
 - **Bonus:**
@@ -144,11 +152,15 @@ hecha con Flutter 3.41.7 (Dart 3.11).
      plano. Mensajes en español (campos vacíos y *"Usuario o contraseña incorrectos"*, texto de error +
      `SnackBar`), bloqueo de 30 s tras 5 intentos; el botón se deshabilita y muestra un loader mientras valida. Si el login es
      correcto se abre la pantalla de inicio (*"Bienvenido, admin"*) con **Cerrar sesión**.
-  4. Ícono propio generado con `flutter_launcher_icons` a partir de un PNG 1024×1024 dibujado por script
-     (`mobile/tool/generate_icon.py`, Pillow), con ícono adaptativo en Android. Nombre visible: **MASSEQ Login**.
+  4. Ícono propio generado con `flutter_launcher_icons` a partir de un PNG 1024×1024 compuesto por script
+     con la insignia sobre azul `#0057A8` (`mobile/tool/generate_icon.py`, Pillow), con ícono adaptativo en
+     Android. Nombre visible: **MASSEQ Login**.
+- Identidad visual de MASSEQ: paleta de la marca y fuentes **Poppins**, **Barlow Semi Condensed** y
+  **Nunito Sans** incluidas como assets (`mobile/assets/fonts`, licencia OFL), sin `google_fonts`: la app
+  funciona sin internet.
 
 Estructura: `lib/main.dart`, `lib/theme.dart`, `lib/screens/` (login e inicio),
-`lib/services/auth_service.dart`, `lib/widgets/` (logo y pie), `test/widget_test.dart`.
+`lib/services/auth_service.dart`, `lib/widgets/` (insignia y pie), `test/widget_test.dart`.
 
 ### Cómo ejecutar
 

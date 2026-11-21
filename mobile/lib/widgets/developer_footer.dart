@@ -14,9 +14,11 @@ class DeveloperFooter extends StatelessWidget {
         Text(
           'Desarrollado por Masseq',
           style: TextStyle(
+            fontFamily: MasseqFonts.label,
             color: MasseqColors.blue,
-            fontSize: 13,
+            fontSize: 15,
             fontWeight: FontWeight.w600,
+            letterSpacing: 0.3,
           ),
         ),
         SizedBox(height: 2),

@@ -83,7 +83,7 @@ void main() {
     await pumpApp(tester);
 
     await attempt(tester, 'admin', 'Masseq2026*');
-    expect(find.text('Bienvenido, admin'), findsOneWidget);
+    expect(find.text('BIENVENIDO, ADMIN'), findsOneWidget);
 
     await tester.ensureVisible(find.byKey(const Key('logoutButton')));
     await tester.tap(find.byKey(const Key('logoutButton')));

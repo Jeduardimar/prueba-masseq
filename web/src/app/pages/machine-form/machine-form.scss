@@ -33,7 +33,10 @@ h1 {
   legend {
     padding: 0;
     margin-bottom: 10px;
-    font-weight: 500;
+    font-family: var(--font-label);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     color: var(--masseq-blue);
   }
 
@@ -110,11 +113,21 @@ h1 {
   padding: 12px 14px;
   border-top: 3px solid var(--masseq-yellow);
   word-break: break-word;
+
+  strong {
+    font-family: var(--font-label);
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--title-color);
+  }
 }
 
 .preview__type {
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-family: var(--font-label);
+  font-size: 0.8rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--masseq-blue);

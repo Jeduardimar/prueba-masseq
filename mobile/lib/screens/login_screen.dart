@@ -131,13 +131,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const MasseqLogo(),
-                        const SizedBox(height: 36),
+                        const MasseqLogo(height: 130),
+                        const SizedBox(height: 28),
                         Text(
                           'LOGIN',
                           style: theme.textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1,
+                            letterSpacing: 1.5,
                           ),
                         ),
                         const SizedBox(height: 24),

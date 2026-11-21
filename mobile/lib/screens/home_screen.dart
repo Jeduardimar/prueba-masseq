@@ -31,10 +31,19 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: MasseqColors.blue,
+        backgroundColor: MasseqColors.black,
         foregroundColor: Colors.white,
-        title: const MasseqLogo(size: 0.6, light: true),
+        toolbarHeight: 64,
+        title: const MasseqLogo(height: 44),
         centerTitle: true,
+        // Línea de acento amarillo → naranja → azul, como en la web.
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(4),
+          child: DecoratedBox(
+            decoration: BoxDecoration(gradient: MasseqColors.accentGradient),
+            child: SizedBox(height: 4, width: double.infinity),
+          ),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -45,9 +54,9 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    'Bienvenido, $username',
-                    style: theme.textTheme.headlineSmall
-                        ?.copyWith(fontWeight: FontWeight.w800),
+                    'BIENVENIDO, ${username.toUpperCase()}',
+                    semanticsLabel: 'Bienvenido, $username',
+                    style: theme.textTheme.headlineSmall,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
@@ -61,17 +70,19 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                   const Card(
                     elevation: 0,
-                    color: Color(0xFFF3F6FB),
+                    color: MasseqColors.surface,
                     child: Padding(
                       padding: EdgeInsets.all(20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Sobre esta app',
+                            'SOBRE ESTA APP',
                             style: TextStyle(
+                              fontFamily: MasseqFonts.label,
                               fontWeight: FontWeight.w700,
-                              fontSize: 16,
+                              fontSize: 17,
+                              letterSpacing: 1,
                               color: MasseqColors.blue,
                             ),
                           ),
@@ -102,7 +113,7 @@ class HomeScreen extends StatelessWidget {
                     key: const Key('logoutButton'),
                     onPressed: () => _logout(context),
                     icon: const Icon(Icons.logout),
-                    label: const Text('Cerrar sesión'),
+                    label: const Text('CERRAR SESIÓN'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: MasseqColors.blue,
                       side: const BorderSide(color: MasseqColors.blue),
