@@ -1,0 +1,28 @@
+# Dependencias
+node_modules/
+
+# Builds y cachés
+dist/
+.angular/
+out-tsc/
+
+# Backend: base de datos local (se crea desde data/seed.json)
+backend/data/db.json
+backend/data/db.json.tmp
+.env
+
+# Flutter / Dart
+mobile/build/
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.packages
+mobile/.pub-cache/
+mobile/.pub/
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.claude/

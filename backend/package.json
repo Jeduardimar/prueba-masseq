@@ -1,0 +1,20 @@
+{
+  "name": "masseq-flota-backend",
+  "version": "1.0.0",
+  "description": "API REST propia (Node + Express) para la flota de maquinaria – prueba técnica MASSEQ",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "reset": "node scripts/reset.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "author": "Juan Eduardo Díaz Martínez",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  }
+}
