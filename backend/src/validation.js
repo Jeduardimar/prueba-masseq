@@ -1,4 +1,5 @@
 const { TYPES, STATUSES } = require('./catalog');
+const { imageUrlError } = require('./image-url');
 
 const MAX_YEAR = new Date().getFullYear() + 1;
 
@@ -54,19 +55,11 @@ function validateMachine(body, partial = false) {
     } else data.year = year;
   } else if (!partial) errors.push('El año es obligatorio.');
 
-  // image (opcional): URL http/https o imagen propia /images/<nombre>.(jpg|svg)
+  // image (opcional): URL https:// pública o imagen propia /images/<nombre>.(jpg|svg) (ver image-url.js)
   if (has('image')) {
     const img = String(b.image).trim();
-    let ok = /^\/images\/[a-z_-]+\.(jpg|svg)$/.test(img);
-    if (!ok) {
-      try {
-        const url = new URL(img);
-        ok = url.protocol === 'http:' || url.protocol === 'https:';
-      } catch {
-        ok = false;
-      }
-    }
-    if (!ok) errors.push('La imagen debe ser una URL válida (http/https) o una imagen propia /images/<nombre>.jpg|.svg.');
+    const error = imageUrlError(img);
+    if (error) errors.push(error);
     else data.image = img;
   }
 

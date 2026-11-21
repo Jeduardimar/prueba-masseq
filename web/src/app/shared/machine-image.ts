@@ -13,6 +13,7 @@ import { resolveImage, typeIllustration, typePhoto } from '../core/images';
     '(error)': 'onError()',
     loading: 'lazy',
     decoding: 'async',
+    referrerpolicy: 'no-referrer',
   },
 })
 export class MachineImage {

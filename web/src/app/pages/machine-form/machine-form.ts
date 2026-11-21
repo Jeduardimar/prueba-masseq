@@ -21,11 +21,10 @@ import {
   typeLabel,
 } from '../../core/machine.model';
 import { MachineImage } from '../../shared/machine-image';
+import { imageUrlValidator } from '../../core/image-url';
 
 const MIN_YEAR = 1980;
 const MAX_YEAR = new Date().getFullYear() + 1;
-/** URL http(s) o imagen propia del backend (/images/<nombre>.jpg|.svg). */
-const IMAGE_PATTERN = /^(https?:\/\/\S+|\/images\/[a-z_-]+\.(jpg|svg))$/i;
 
 /** Nombres de los campos en español para los mensajes de error. */
 const LABELS: Record<string, string> = {
@@ -89,7 +88,7 @@ export class MachineForm {
     status: this.fb.control<MachineStatus>('disponible', Validators.required),
     location: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(120)]],
     description: ['', Validators.maxLength(2000)],
-    image: ['', Validators.pattern(IMAGE_PATTERN)],
+    image: ['', imageUrlValidator],
   });
 
   /** Valores del formulario como signal (para la vista previa). */
@@ -172,7 +171,7 @@ export class MachineForm {
     if (e['maxlength']) return `${label} no puede superar ${e['maxlength'].requiredLength} caracteres.`;
     if (e['min'] || e['max'] || (name === 'year' && e['pattern']))
       return `El año debe estar entre ${MIN_YEAR} y ${MAX_YEAR}.`;
-    if (e['pattern']) return 'Ingresa una URL válida que empiece por http:// o https://.';
+    if (e['imageUrl']) return e['imageUrl'];
     return `${label} no es válido.`;
   }
 

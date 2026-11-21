@@ -95,7 +95,7 @@ Modelo de un equipo:
 
 - `type`: `volqueta | retroexcavadora | excavadora | motoniveladora | vibrocompactador | cargador | bulldozer | carrotanque | trituradora`
 - `status`: `disponible | en_obra | mantenimiento`
-- `image` (opcional): URL `http(s)` o una imagen propia `/images/<nombre>.jpg|.svg`. Si se omite, se asigna la foto del tipo (`/images/<tipo>.jpg`).
+- `image` (opcional): URL `https://` pública (ver [Seguridad](#seguridad)) o una imagen propia `/images/<nombre>.jpg|.svg`. Si se omite, se asigna la foto del tipo (`/images/<tipo>.jpg`).
 - `statusHistory` (solo lectura): tramos `{ status, from, to }` con fechas ISO 8601 en orden cronológico; el
   último es el estado actual y tiene `to: null`. `POST` lo crea con el estado inicial; `PUT`/`PATCH` cierran el
   tramo actual y abren uno nuevo **solo si cambia el estado**. El cliente no puede enviarlo (la validación lo
@@ -234,7 +234,14 @@ Revisión basada en el **OWASP Top 10:2025**.
   cuerpo no envía `Content-Type: application/json`; `400` si el JSON está mal formado.
 - **Tope de 200 equipos** (`409`) para que la demo no llene el almacenamiento.
 - **Validación con lista blanca de campos:** solo se guardan los campos conocidos (no se puede inyectar `id`
-  ni otros campos); tipos, estados, rangos y longitudes validados; imágenes solo `http(s)` o `/images/...`.
+  ni otros campos); tipos, estados, rangos y longitudes validados.
+- **URL de imagen endurecida** (`backend/src/image-url.js`, con pruebas): solo `https://` (se rechaza
+  `http://`), máximo 500 caracteres, sin usuario/contraseña en la URL y sin hosts locales o privados
+  (`localhost`, `*.localhost`, `*.local`, `127.0.0.0/8`, `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`,
+  `169.254.0.0/16` —metadatos de la nube—, `0.0.0.0/8`, `::1`, IPv6 privadas y mapeadas). Como se valida
+  sobre la URL ya normalizada, también se detectan formas como `https://2130706433/` (127.0.0.1 en decimal).
+  Sigue aceptando las imágenes propias `/images/<nombre>.jpg|.svg`. El formulario de Angular aplica la misma
+  validación (`web/src/app/core/image-url.ts`) con mensajes en español.
 - **Errores sin trazas:** el cliente recibe mensajes genéricos en español; el detalle solo va al log.
 - `npm audit`: backend sin vulnerabilidades. Web: dependencias de producción sin vulnerabilidades; quedan
   16 avisos *moderate* solo en herramientas de desarrollo del Angular CLI (`minimatch`/`tuf-js`), cuya
@@ -249,6 +256,9 @@ Revisión basada en el **OWASP Top 10:2025**.
 - Para cumplir la CSP sin `'unsafe-inline'` en scripts se desactivó `inlineCritical` en el build de
   producción (Angular cargaba el CSS con un `onload` en línea, que la CSP bloquearía).
 - Sin `innerHTML` ni `bypassSecurityTrust*` (Angular escapa todo el contenido) y sin secretos en el frontend.
+- Las imágenes de los equipos (directiva `appMachineImage`) llevan `referrerpolicy="no-referrer"` (el host
+  externo no recibe la URL de la app), `loading="lazy"` y `decoding="async"`. La CSP limita `img-src` a
+  `'self' data: https:` (sin `http:`).
 
 ### Móvil
 
@@ -261,6 +271,23 @@ Revisión basada en el **OWASP Top 10:2025**.
   visibles; el bloqueo se mantiene aunque se cierre la app.
 - `android:allowBackup="false"`, APK de release **ofuscado** (`--obfuscate --split-debug-info=build/symbols`)
   y sin `print` de datos sensibles.
+
+### Siguiente paso: subir imágenes desde el dispositivo
+
+Hoy la imagen es una URL externa o la foto del tipo. Subir archivos **no está implementado**; este sería el
+diseño seguro:
+
+1. **Recepción:** `multer` con almacenamiento **en memoria**, un solo archivo y máximo **2 MB** (`limits`).
+2. **Tipo real:** verificar los *magic bytes* del archivo (p. ej. con `file-type`) y aceptar solo JPEG, PNG y
+   WebP; no confiar en la extensión ni en el `Content-Type`. **Sin SVG** (puede llevar scripts).
+3. **Re-codificación** con `sharp`: redimensionar (p. ej. máx. 1600 px), volver a codificar a WebP/JPEG y
+   **quitar metadatos EXIF** (ubicación GPS, cámara). Esto también neutraliza archivos "políglotas".
+4. **Nombre aleatorio** con UUID (`crypto.randomUUID()`), nunca el nombre original; rutas sin datos del usuario.
+5. **Límites:** rate limit específico para subidas y un **tope de almacenamiento** (número de archivos y MB).
+6. **Al servirlas:** `X-Content-Type-Options: nosniff`, `Content-Type` fijo según el formato re-codificado,
+   `Content-Disposition: inline` y una CSP restrictiva (`default-src 'none'`) en esas rutas.
+7. **Almacenamiento persistente** tipo S3 o Cloudinary (URLs firmadas o bucket público de solo lectura),
+   porque Render gratuito **borra el disco al reiniciar** y las imágenes se perderían.
 
 ### Limitación declarada
 
