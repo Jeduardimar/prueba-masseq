@@ -12,8 +12,8 @@ buscar, ver el detalle, agregar, editar y eliminar equipos.
 
 | Parte | URL |
 | --- | --- |
-| Web (Vercel) | _por completar_ |
-| API (Render) | _por completar_ (`https://masseq-flota-api.onrender.com`, por confirmar) |
+| Web (Vercel) | https://prueba-masseq.vercel.app |
+| API (Render) | https://masseq-flota-api.onrender.com |
 | App móvil (APK) | _por completar_ |
 
 > **Nota sobre Render gratuito:** el servidor se duerme tras unos minutos sin uso; la primera petición
