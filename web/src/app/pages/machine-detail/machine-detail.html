@@ -1,0 +1,58 @@
+<a class="back-link" routerLink="/"><mat-icon>arrow_back</mat-icon> Volver al listado</a>
+
+@if (machine(); as m) {
+  <article class="detail">
+    <div class="detail__media">
+      <img appMachineImage [image]="m.image" [type]="m.type" [alt]="m.title" width="400" height="260" />
+    </div>
+
+    <div class="detail__info">
+      <span class="detail__type">{{ typeLabel(m.type) }}</span>
+      <h1>{{ m.title }}</h1>
+      <span class="status-badge status-badge--{{ m.status }}">{{ statusLabel(m.status) }}</span>
+
+      <dl class="specs">
+        <div><dt>Marca</dt><dd>{{ m.brand }}</dd></div>
+        <div><dt>Modelo</dt><dd>{{ m.model }}</dd></div>
+        <div><dt>Año</dt><dd>{{ m.year }}</dd></div>
+        <div><dt>Capacidad</dt><dd>{{ m.capacity || 'No registrada' }}</dd></div>
+        <div class="specs__wide"><dt>Ubicación</dt><dd><mat-icon inline>place</mat-icon> {{ m.location }}</dd></div>
+      </dl>
+
+      <section class="description">
+        <h2>Descripción</h2>
+        <p>{{ m.description || 'Sin descripción.' }}</p>
+      </section>
+
+      <div class="actions">
+        <a mat-flat-button [routerLink]="['/maquinaria', m.id, 'editar']">
+          <mat-icon>edit</mat-icon> Editar
+        </a>
+        <button mat-stroked-button type="button" class="delete-btn" (click)="confirmDelete()" [disabled]="deleting()">
+          @if (deleting()) {
+            <mat-spinner diameter="18" />
+          } @else {
+            <mat-icon>delete</mat-icon>
+          }
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </article>
+} @else if (loading()) {
+  <div class="state-box" role="status">
+    <mat-spinner diameter="44" />
+    <p>Cargando equipo…</p>
+  </div>
+} @else if (error()) {
+  <div class="state-box state-box--error" role="alert">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error() }}</p>
+    <div class="actions">
+      @if (validId()) {
+        <button mat-stroked-button type="button" (click)="retry()"><mat-icon>refresh</mat-icon> Reintentar</button>
+      }
+      <a mat-flat-button routerLink="/">Ir al listado</a>
+    </div>
+  </div>
+}
