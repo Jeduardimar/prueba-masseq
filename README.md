@@ -1,6 +1,7 @@
 # MASSEQ · Flota de maquinaria
 
 Prueba técnica para el cargo de **Desarrollador FrontEnd** en MASSEQ.
+Desarrollado por **Juan Eduardo Díaz Martínez**.
 
 Aplicación para gestionar una flota de maquinaria pesada (volquetas, retroexcavadoras, excavadoras,
 motoniveladoras, vibrocompactadores, cargadores, bulldozer, carrotanque y planta trituradora): listar,
@@ -16,7 +17,11 @@ buscar, ver el detalle, agregar, editar y eliminar equipos.
 | --- | --- |
 | Web (Vercel) | https://prueba-masseq.vercel.app |
 | API (Render) | https://masseq-flota-api.onrender.com |
-| App móvil (APK) | Adjunto en [GitHub Releases](../../releases) (`app-release.apk`) |
+| App móvil (APK) | [Release v1.1](https://github.com/Jeduardimar/prueba-masseq/releases/tag/v1.1) (`masseq-login-v1.1.apk`) |
+| Repositorio | https://github.com/Jeduardimar/prueba-masseq |
+
+**Credenciales de demo de la app móvil:** usuario `admin`, contraseña `Masseq2026*`.
+La web y la API no piden inicio de sesión (ver [Limitación declarada](#limitación-declarada)).
 
 > **Nota sobre Render gratuito:** el servidor se duerme tras unos minutos sin uso; la primera petición
 > puede tardar hasta un minuto (la web muestra el aviso *"Conectando con el servidor…"*). Además, el
@@ -210,7 +215,7 @@ flutter build apk --release --obfuscate --split-debug-info=build/symbols  # APK 
 python tool/generate_icon.py && dart run flutter_launcher_icons   # regenerar el ícono
 ```
 
-El APK de release se adjunta en **GitHub Releases**.
+El APK de release se adjunta en **GitHub Releases** ([v1.1](https://github.com/Jeduardimar/prueba-masseq/releases/tag/v1.1), archivo `masseq-login-v1.1.apk`).
 
 > **Nota de compilación en Windows:** el JDK que trae Android Studio es la versión 25, así que el proyecto
 > usa Gradle 9.1 y AGP 8.13 (la plantilla de Flutter traía Gradle 8.14, que no soporta Java 25). Si la ruta
