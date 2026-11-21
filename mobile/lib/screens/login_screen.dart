@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -24,9 +26,40 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   bool _loading = false;
   String? _authError;
+  int? _remainingAttempts;
+  int _lockSeconds = 0;
+  Timer? _lockTimer;
+
+  bool get _locked => _lockSeconds > 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Si la app se cerró durante un bloqueo, se respeta el tiempo restante.
+    widget.authService.lockRemaining().then((left) {
+      if (mounted && left > Duration.zero) _startLock(left);
+    });
+  }
+
+  void _startLock(Duration duration) {
+    _lockTimer?.cancel();
+    setState(() {
+      _lockSeconds = duration.inSeconds.clamp(1, 999);
+      _remainingAttempts = null;
+    });
+    _lockTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return timer.cancel();
+      setState(() => _lockSeconds--);
+      if (_lockSeconds <= 0) {
+        timer.cancel();
+        setState(() => _authError = null);
+      }
+    });
+  }
 
   @override
   void dispose() {
+    _lockTimer?.cancel();
     _usernameCtrl.dispose();
     _passwordCtrl.dispose();
     _passwordFocus.dispose();
@@ -34,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _submit() async {
-    if (_loading) return;
+    if (_loading || _locked) return;
     setState(() => _authError = null);
     if (!_formKey.currentState!.validate()) return;
 
@@ -47,7 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
     setState(() => _loading = false);
 
-    if (result == LoginResult.success) {
+    if (result.isSuccess) {
       final username = _usernameCtrl.text.trim();
       _passwordCtrl.clear();
       await Navigator.of(context).pushReplacement(
@@ -61,7 +94,11 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    setState(() => _authError = result.message);
+    if (result.status == LoginStatus.locked) _startLock(result.lockedFor);
+    setState(() {
+      _authError = result.message;
+      _remainingAttempts = result.remainingAttempts;
+    });
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(result.message!)));
@@ -87,7 +124,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     key: _formKey,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     onChanged: () {
-                      if (_authError != null) setState(() => _authError = null);
+                      if (_authError != null && !_locked) {
+                        setState(() => _authError = null);
+                      }
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -150,7 +189,16 @@ class _LoginScreenState extends State<LoginScreen> {
                               : null,
                           onFieldSubmitted: (_) => _submit(),
                         ),
-                        if (_authError != null) ...[
+                        if (_locked) ...[
+                          const SizedBox(height: 12),
+                          Text(
+                            'Demasiados intentos fallidos. Intenta de nuevo '
+                            'en $_lockSeconds s.',
+                            key: const Key('lockMessage'),
+                            style: TextStyle(color: theme.colorScheme.error),
+                            textAlign: TextAlign.center,
+                          ),
+                        ] else if (_authError != null) ...[
                           const SizedBox(height: 12),
                           Text(
                             _authError!,
@@ -158,13 +206,24 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: TextStyle(color: theme.colorScheme.error),
                             textAlign: TextAlign.center,
                           ),
+                          if (_remainingAttempts != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text(
+                                _remainingAttempts == 1
+                                    ? 'Te queda 1 intento.'
+                                    : 'Te quedan $_remainingAttempts intentos.',
+                                key: const Key('remainingAttempts'),
+                                style: theme.textTheme.bodySmall,
+                              ),
+                            ),
                         ],
                         const SizedBox(height: 28),
                         FractionallySizedBox(
                           widthFactor: 0.6,
                           child: FilledButton(
                             key: const Key('loginButton'),
-                            onPressed: _loading ? null : _submit,
+                            onPressed: _loading || _locked ? null : _submit,
                             child: _loading
                                 ? const SizedBox.square(
                                     dimension: 22,

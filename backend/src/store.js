@@ -40,6 +40,8 @@ function all(search) {
   return items.filter((m) => normalize(`${m.title} ${m.brand} ${m.model}`).includes(q));
 }
 
+const count = () => items.length;
+
 const findById = (id) => items.find((m) => m.id === id) || null;
 
 function create(data) {
@@ -65,4 +67,4 @@ function remove(id) {
   return true;
 }
 
-module.exports = { load, all, findById, create, update, remove };
+module.exports = { load, all, count, findById, create, update, remove };

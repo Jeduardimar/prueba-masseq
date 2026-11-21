@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'screens/login_screen.dart';
@@ -7,8 +9,9 @@ import 'theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final authService = AuthService();
-  // La primera vez que se abre la app se crea el usuario de demostración.
-  await authService.ensureDemoUser();
+  // La primera vez que se abre la app se crea el usuario de demostración
+  // (en segundo plano, para no retrasar el primer frame).
+  unawaited(authService.ensureDemoUser());
   runApp(MasseqApp(authService: authService));
 }
 

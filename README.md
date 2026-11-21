@@ -31,11 +31,11 @@ mobile/    App móvil (Flutter): login MASSEQ
 
 ## Tecnologías
 
-- **Backend:** Node.js 22, Express 5, CORS. Persistencia en archivo JSON (`data/db.json`).
+- **Backend:** Node.js 22, Express 5, CORS, helmet, express-rate-limit. Persistencia en archivo JSON (`data/db.json`).
 - **Web:** Angular 21 (componentes standalone, signals, control flow `@if/@for`, zoneless),
   Angular Material 21 (tema M3 *azure*), formularios reactivos, `HttpClient` con `withFetch()`,
   rutas *lazy* con `withComponentInputBinding()`, `rxResource`.
-- **Móvil:** Flutter 3.41 (Material 3), `flutter_svg`, `shared_preferences`, `crypto`, `flutter_launcher_icons`.
+- **Móvil:** Flutter 3.41 (Material 3), `flutter_svg`, `flutter_secure_storage`, `cryptography`, `flutter_launcher_icons`.
 - **Despliegue:** Vercel (web) y Render (API).
 
 ## Cómo ejecutar en local
@@ -139,10 +139,10 @@ hecha con Flutter 3.41.7 (Dart 3.11).
 - **Bonus:**
   1. Contraseña enmascarada con `•` (`obscureText` + `obscuringCharacter`).
   2. Botón de ojo para mostrar u ocultar la contraseña.
-  3. Login local con `shared_preferences`: el usuario de demo se crea la primera vez que se abre la app y
-     la contraseña se guarda como **hash SHA-256 con una sal aleatoria** (paquete `crypto`), nunca en texto
-     plano. Mensajes en español para campos vacíos, usuario inexistente y contraseña incorrecta (texto de
-     error + `SnackBar`); el botón se deshabilita y muestra un loader mientras valida. Si el login es
+  3. Login local con `flutter_secure_storage`: el usuario de demo se crea la primera vez que se abre la app y
+     la contraseña se deriva con **PBKDF2-HMAC-SHA256** (100.000 iteraciones, sal aleatoria), nunca en texto
+     plano. Mensajes en español (campos vacíos y *"Usuario o contraseña incorrectos"*, texto de error +
+     `SnackBar`), bloqueo de 30 s tras 5 intentos; el botón se deshabilita y muestra un loader mientras valida. Si el login es
      correcto se abre la pantalla de inicio (*"Bienvenido, admin"*) con **Cerrar sesión**.
   4. Ícono propio generado con `flutter_launcher_icons` a partir de un PNG 1024×1024 dibujado por script
      (`mobile/tool/generate_icon.py`, Pillow), con ícono adaptativo en Android. Nombre visible: **MASSEQ Login**.
@@ -159,7 +159,7 @@ flutter run -d chrome        # web
 flutter run                  # emulador o dispositivo Android
 flutter analyze              # sin issues
 flutter test                 # tests de widget del login
-flutter build apk --release  # build/app/outputs/flutter-apk/app-release.apk
+flutter build apk --release --obfuscate --split-debug-info=build/symbols  # APK en build/app/outputs/flutter-apk/
 python tool/generate_icon.py && dart run flutter_launcher_icons   # regenerar el ícono
 ```
 
@@ -170,6 +170,57 @@ El APK de release se adjunta en **GitHub Releases**.
 > del usuario tiene espacios y Gradle falla con `Unable to establish loopback connection`, define antes de
 > compilar una carpeta sin espacios para los sockets de Java, por ejemplo en PowerShell:
 > `$env:JAVA_TOOL_OPTIONS='-Djdk.net.unixdomain.tmpdir=C:\Users\Public'`.
+
+## Seguridad
+
+Revisión basada en el **OWASP Top 10:2025**.
+
+### API (backend)
+
+- **Cabeceras de seguridad** con `helmet` (CSP, HSTS, `nosniff`, `frame-ancestors`, sin `X-Powered-By`).
+  `Cross-Origin-Resource-Policy: cross-origin` para que la web en Vercel cargue las imágenes.
+- **CORS con lista blanca** desde la variable `ALLOWED_ORIGINS` (separada por comas). Por defecto:
+  `https://prueba-masseq.vercel.app,http://localhost:4200`.
+- **Rate limiting** (`express-rate-limit`, con `trust proxy` para Render): 300 peticiones / 15 min por IP en
+  `/api` y 30 escrituras (POST/PUT/PATCH/DELETE) / 15 min. Responde `429` en español.
+- **Cuerpos acotados:** `express.json({ limit: '10kb' })` → `413` si se supera; `415` si una escritura con
+  cuerpo no envía `Content-Type: application/json`; `400` si el JSON está mal formado.
+- **Tope de 200 equipos** (`409`) para que la demo no llene el almacenamiento.
+- **Validación con lista blanca de campos:** solo se guardan los campos conocidos (no se puede inyectar `id`
+  ni otros campos); tipos, estados, rangos y longitudes validados; imágenes solo `http(s)` o `/images/...`.
+- **Errores sin trazas:** el cliente recibe mensajes genéricos en español; el detalle solo va al log.
+- `npm audit`: backend sin vulnerabilidades. Web: dependencias de producción sin vulnerabilidades; quedan
+  16 avisos *moderate* solo en herramientas de desarrollo del Angular CLI (`minimatch`/`tuf-js`), cuya
+  única corrección propuesta es bajar el CLI a la v16 (rompe el proyecto), por lo que se dejaron.
+- **Dependabot** (`.github/dependabot.yml`): actualizaciones semanales de npm (`/backend`, `/web`) y pub (`/mobile`).
+
+### Web
+
+- Cabeceras en `vercel.json`: **Content-Security-Policy** estricta (`script-src 'self'`, `connect-src` solo a
+  la API, `frame-ancestors 'none'`…), `X-Content-Type-Options: nosniff`, `Referrer-Policy`,
+  `Permissions-Policy` (cámara, micrófono y geolocalización desactivados), HSTS y `X-Frame-Options: DENY`.
+- Para cumplir la CSP sin `'unsafe-inline'` en scripts se desactivó `inlineCritical` en el build de
+  producción (Angular cargaba el CSS con un `onload` en línea, que la CSP bloquearía).
+- Sin `innerHTML` ni `bypassSecurityTrust*` (Angular escapa todo el contenido) y sin secretos en el frontend.
+
+### Móvil
+
+- Usuario guardado con **`flutter_secure_storage`** (Android Keystore; en la web, Web Crypto).
+- La contraseña nunca se guarda: se deriva con **PBKDF2-HMAC-SHA256** (paquete `cryptography`,
+  100.000 iteraciones, sal aleatoria de 16 bytes) en un isolate aparte, y se compara en **tiempo constante**.
+- **Mensaje genérico** *"Usuario o contraseña incorrectos"* (no revela si el usuario existe; también se
+  deriva la clave cuando el usuario no existe para no filtrar información por tiempo de respuesta).
+- **Bloqueo de 30 s tras 5 intentos fallidos**, con contador de intentos restantes y cuenta regresiva
+  visibles; el bloqueo se mantiene aunque se cierre la app.
+- `android:allowBackup="false"`, APK de release **ofuscado** (`--obfuscate --split-debug-info=build/symbols`)
+  y sin `print` de datos sensibles.
+
+### Limitación declarada
+
+La **API de demo no tiene autenticación**: cualquiera puede crear, editar o eliminar equipos (mitigado solo con
+rate limiting, validación y el tope de 200 equipos). El login de la app móvil es local y no protege la API.
+El siguiente paso sería **autenticación con JWT y roles** (p. ej. `admin` para escribir y lectura pública),
+con contraseñas con hash bcrypt y rutas protegidas en la web.
 
 ## Autor
 

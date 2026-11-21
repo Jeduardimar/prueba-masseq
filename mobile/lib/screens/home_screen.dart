@@ -84,8 +84,9 @@ class HomeScreen extends StatelessWidget {
                           _SummaryItem(
                             icon: Icons.lock_outline,
                             text: 'Login local: el usuario se guarda en el '
-                                'dispositivo y la contraseña como hash '
-                                'SHA-256 con sal, nunca en texto plano.',
+                                'almacenamiento seguro del dispositivo y la '
+                                'contraseña se deriva con PBKDF2-HMAC-SHA256 '
+                                '(100.000 iteraciones y sal aleatoria).',
                           ),
                           _SummaryItem(
                             icon: Icons.language,

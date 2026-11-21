@@ -1,6 +1,8 @@
 const path = require('path');
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const { rateLimit } = require('express-rate-limit');
 const store = require('./store');
 const { validateMachine } = require('./validation');
 const { TYPES, STATUSES, defaultImage } = require('./catalog');
@@ -8,9 +10,57 @@ const { TYPES, STATUSES, defaultImage } = require('./catalog');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const BASE = '/api/machines';
+/** Tope de equipos para que la demo no llene el almacenamiento. */
+const MAX_MACHINES = 200;
+const WRITE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
+const BODY_METHODS = new Set(['POST', 'PUT', 'PATCH']);
 
-app.use(cors());
-app.use(express.json({ limit: '1mb' }));
+// Orígenes permitidos (CORS). Variable ALLOWED_ORIGINS separada por comas.
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'https://prueba-masseq.vercel.app,http://localhost:4200')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+// Render está detrás de un proxy: así req.ip es la IP real del cliente (para el rate limit).
+app.set('trust proxy', 1);
+
+// Cabeceras de seguridad. cross-origin para que la web en Vercel pueda cargar las imágenes.
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+
+app.use(
+  cors({
+    // Sin cabecera Origin (curl, health checks de Render) se permite; los navegadores
+    // de otros orígenes no reciben cabeceras CORS y el navegador bloquea la respuesta.
+    origin: (origin, cb) => cb(null, !origin || ALLOWED_ORIGINS.includes(origin)),
+  }),
+);
+
+const tooManyRequests = (message) => ({
+  windowMs: 15 * 60 * 1000,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { message },
+});
+// General: 300 peticiones / 15 min por IP en la API.
+app.use('/api', rateLimit({ ...tooManyRequests('Demasiadas peticiones. Intenta de nuevo en unos minutos.'), limit: 300 }));
+// Escrituras: 30 / 15 min por IP.
+app.use(
+  '/api',
+  rateLimit({
+    ...tooManyRequests('Demasiadas modificaciones. Intenta de nuevo en unos minutos.'),
+    limit: 30,
+    skip: (req) => !WRITE_METHODS.has(req.method),
+  }),
+);
+
+// Las escrituras con cuerpo deben enviar JSON.
+app.use('/api', (req, res, next) => {
+  if (BODY_METHODS.has(req.method) && !req.is('application/json')) {
+    return res.status(415).json({ message: 'El cuerpo debe enviarse como JSON (Content-Type: application/json).' });
+  }
+  next();
+});
+app.use(express.json({ limit: '10kb' }));
 // Ilustraciones propias de cada tipo de equipo
 app.use('/images', express.static(path.join(__dirname, '..', 'public', 'images'), { maxAge: '7d' }));
 
@@ -68,6 +118,9 @@ app.get(`${BASE}/:id`, (req, res) => {
 app.post(BASE, (req, res) => {
   const { errors, data } = validateMachine(req.body, false);
   if (errors.length) return res.status(400).json({ message: 'Datos inválidos.', errors });
+  if (store.count() >= MAX_MACHINES) {
+    return res.status(409).json({ message: `Se alcanzó el máximo de ${MAX_MACHINES} equipos. Elimina alguno antes de agregar otro.` });
+  }
   if (!data.image) data.image = defaultImage(data.type);
   res.status(201).json(store.create(data));
 });
@@ -108,12 +161,15 @@ app.delete(`${BASE}/:id`, (req, res) => {
 // 404 genérico
 app.use((_req, res) => res.status(404).json({ message: 'Ruta no encontrada.' }));
 
-// Errores (p. ej. JSON mal formado)
+// Errores: respuestas en español y sin trazas internas.
 app.use((err, _req, res, _next) => {
   if (err.type === 'entity.parse.failed') {
     return res.status(400).json({ message: 'El cuerpo de la petición no es un JSON válido.' });
   }
-  console.error(err);
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ message: 'El cuerpo de la petición es demasiado grande (máximo 10 KB).' });
+  }
+  console.error(err.message);
   res.status(500).json({ message: 'Error interno del servidor.' });
 });
 
